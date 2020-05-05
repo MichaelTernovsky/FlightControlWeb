@@ -18,7 +18,6 @@ namespace FlightControlWeb
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            //hey!
         }
 
         public IConfiguration Configuration { get; }
