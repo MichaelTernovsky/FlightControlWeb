@@ -12,12 +12,11 @@ namespace FlightControlWeb.Controllers
     [Route("[controller]")]
     public class ServersController : ControllerBase
     {
-        // the model
         private IServerManager model = new ServerManager();
 
         // GET: api/Servers
         [HttpGet]
-        public IEnumerable<Server> getAllExternalServers()
+        public IEnumerable<Server> GetAllExternalServers()
         {
             return this.model.getAllExternalServers();
         }
@@ -25,14 +24,14 @@ namespace FlightControlWeb.Controllers
         // GET: api/Servers/5
         [HttpGet("{serverID}", Name = "GetServer")]
 
-        public Server getServer(string serverID)
+        public Server GetServer(string serverID)
         {
             return this.model.getServer(serverID);
         }
 
         // POST: api/Servers
         [HttpPost]
-        public void addNewServer(Server newServer)
+        public void AddNewServer(Server newServer)
         {
             this.model.addNewServer(newServer);
         }

@@ -19,6 +19,11 @@ namespace FlightControlWeb.Model
             new Flight{ FlightID="3",Longtitude=3,Latitude=3,Passangers=3,CompanyName="3",DateTime="3",IsExternal=false},
             };
 
+        public IEnumerable<Flight> getAllFlights()
+        {
+            return allFlightsList;
+        }
+
         public IEnumerable<Flight> getAllInternalFlights()
         {
             List<Flight> internalFlights = new List<Flight>();
@@ -30,11 +35,6 @@ namespace FlightControlWeb.Model
             }
 
             return internalFlights;
-        }
-
-        public IEnumerable<Flight> getAllFlights()
-        {
-            return allFlightsList;
         }
     }
 }

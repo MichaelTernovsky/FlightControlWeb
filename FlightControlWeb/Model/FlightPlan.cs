@@ -33,6 +33,7 @@ namespace FlightControlWeb.Model
     public class FlightPlan
     {
         // Properties
+        public string FlightID { get; set; }
         public int Passangers { get; set; }
         public string CompanyName { get; set; }
         public FlightInitialLocation Initial_Location { get; set; }
