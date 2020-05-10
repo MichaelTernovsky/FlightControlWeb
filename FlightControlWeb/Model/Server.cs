@@ -5,42 +5,13 @@ using System.Threading.Tasks;
 
 namespace FlightControlWeb.Model
 {
+    /*
+     * The class is representing one Server and its details.
+     */
     public class Server
     {
-        // fields
-        private string serverID;
-        private string serverURL;
-
-        // CTOR
-        public Server(string serverID, string serverURL)
-        {
-            this.serverID = serverID;
-            this.serverURL = serverURL;
-        }
-
         // Properties
-        public string ServerID
-        {
-            get
-            {
-                return this.serverID;
-            }
-            set
-            {
-                this.serverID = value;
-            }
-        }
-
-        public string ServerURL
-        {
-            get
-            {
-                return this.serverURL;
-            }
-            set
-            {
-                this.serverURL = value;
-            }
-        }
+        public string ServerID { get; set; }
+        public string ServerURL { get; set; }
     }
 }

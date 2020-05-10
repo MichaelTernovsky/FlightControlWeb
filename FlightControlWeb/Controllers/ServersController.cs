@@ -13,7 +13,7 @@ namespace FlightControlWeb.Controllers
     public class ServersController : ControllerBase
     {
         // the model
-        private IFlightModel model = new MyFlightModel();
+        private IServerManager model = new ServerManager();
 
         // GET: api/Servers
         [HttpGet]
@@ -31,10 +31,10 @@ namespace FlightControlWeb.Controllers
         }
 
         // POST: api/Servers
-        [HttpPost("{serverID},{serverURL}", Name = "AddNewServer")]
-        public void addNewServer([FromBody] string serverID, string serverURL)
+        [HttpPost]
+        public void addNewServer(Server newServer)
         {
-            this.model.addNewServer(serverID, serverURL);
+            this.model.addNewServer(newServer);
         }
 
         // DELETE: api/ApiWithActions/5

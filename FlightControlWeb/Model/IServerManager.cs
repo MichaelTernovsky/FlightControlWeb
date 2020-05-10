@@ -5,10 +5,13 @@ using System.Threading.Tasks;
 
 namespace FlightControlWeb.Model
 {
-    interface IFlightModel
+    /*
+     * The interface of our models of our web app
+     */
+    public interface IServerManager
     {
         IEnumerable<Server> getAllExternalServers();
-        void addNewServer(string serverID, string serverURL);
+        void addNewServer(Server newServer);
         void deleteServer(string serverID);
         Server getServer(string serverID);
     }
