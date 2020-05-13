@@ -1,6 +1,17 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <style>
+        #map {
+            position: absolute;
+            top: 500px;
+            bottom: 50px;
+            left: 50px;
+            right: 50px;
+        }
+    </style>
     <title>Bootstrap Example</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,18 +19,76 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
+
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-8">
-                .col-md-8
-                <div class="row">
-                    <div class="col-md-6">.col-md-6</div>
-                    <div class="col-md-6">.col-md-6</div>
-                </div>
-            </div>
-            <div class="col-md-4">.col-md-4</div>
-        </div>
-    </div>
+
+    <h2> Add New Server</h2>
+    ServerID: <input type="text" /><br />
+    ServerURL: <input type="text" /><br />
+    <button id="btnAddServer">Add Server</button>
+    <h2>Server Table</h2>
+    <table id=" tblServer">
+        <thead>
+            <tr>
+                <th>ServerID</th>
+                <th>ServerURL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td> checkID1</td>
+                <td> CheckURL1</td>
+            </tr>
+            <tr>
+                <td> checkID2--needSpace---</td>
+                <td> CheckURL</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <script src="../Scripts/jquery-3.5.1.min.js"></script>
+    <script>
+        var serversUrl = "../api/Servers";
+        $.getJSON(serversUrl, function (data) {
+            console.log(data);
+            data.forEach(function (server) {
+                $("#tblServer").append("<tr><td>" + server.ServerId + "</td>" + "<td>" + ServerURL + "</td></tr>");
+            });
+        });
+    </script>
+
+
+    <!--
+        <script type="text/javascript">
+            const tblBody = document.querySelector("#tblServer > tbody");
+            console.log(tblBody);
+        </script>"
+    -->
+    <!------------------------------------------------------------------------>
+    <div id="map"> </div>
+    <script>
+        var map = L.map('map').setView([0, 0], 1);
+        L.tileLayer('https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=z9JRmQouqskUAwB0autN', {
+            attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+        }).addTo(map);
+        var leafletIcon = L.icon({
+            iconUrl: 'https://img.icons8.com/color/48/000000/penis.png',
+            shadowUrl: 'https://leafletjs.com/examples/custom-icons/leaf-shadow.png',
+            iconSize: [48, 60],
+            iconAnchor: [22, 94],
+            shadowAnchor: [4, 62],
+            popupAnchor: [12, -90]
+        })
+        var marker = L.marker([51.5, -0.09], { icon: leafletIcon }).addTo(map);
+        var circle = L.circle([51.508, -0.11], {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.5,
+            radius: 500
+        }).addTo(map);
+        circle.bindPopup("<b> Hey Michael!</b><br> Im a Circle MotherFucker!").openPopup();
+        marker.bindPopup("<b> Hey Michael!</b><br> Im a Dick Marker MotherFucker!").openPopup();
+    </script>
 </body>
 </html>
