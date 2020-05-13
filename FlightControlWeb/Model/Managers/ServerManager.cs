@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using FlightControlWeb.Model.ConcreteObjects;
+using FlightControlWeb.Model.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace FlightControlWeb.Model
+namespace FlightControlWeb.Model.Managers
 {
     /*
      * The concrete server manager of our web app
@@ -13,9 +13,6 @@ namespace FlightControlWeb.Model
     {
         // the list of servers
         private static List<Server> serversList = new List<Server>();
-
-        //MemoryCache MemoryCache = new MemoryCache(int id, Flight f);
-
 
         // Servers method implemantaion
         public void addNewServer(Server newServer)

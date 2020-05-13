@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace FlightControlWeb.Model
+namespace FlightControlWeb.Model.ConcreteObjects
 {
     /*
      * The class is representing one segment of FlightPlan
@@ -11,9 +9,9 @@ namespace FlightControlWeb.Model
     public class FlightSegment
     {
         // Properties
-        public double Longtitude { get; set; }
+        public double Longitude { get; set; }
         public double Latitude { get; set; }
-        public string TimeSpan_Seconds { get; set; }
+        public double TimeSpan_Seconds { get; set; }
     }
 
     /*
@@ -22,9 +20,9 @@ namespace FlightControlWeb.Model
     public class FlightInitialLocation
     {
         // Properties
-        public double Longtitude { get; set; }
+        public double Longitude { get; set; }
         public double Latitude { get; set; }
-        public string Date_Time { get; set; }
+        public DateTime Date_Time { get; set; }
     }
 
     /*
@@ -33,9 +31,9 @@ namespace FlightControlWeb.Model
     public class FlightPlan
     {
         // Properties
-        public string FlightID { get; set; }
-        public int Passangers { get; set; }
-        public string CompanyName { get; set; }
+        public string Flight_ID { get; set; }
+        public int Passengers { get; set; }
+        public string Company_Name { get; set; }
         public FlightInitialLocation Initial_Location { get; set; }
         public IEnumerable<FlightSegment> Segments { get; set; }
     }

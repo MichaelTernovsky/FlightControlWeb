@@ -1,24 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FlightControlWeb.Model;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using FlightControlWeb.Model.ConcreteObjects;
+using FlightControlWeb.Model.Interfaces;
+using FlightControlWeb.Model.Managers;
 
 namespace FlightControlWeb.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class ServersController : ControllerBase
     {
-        private IServerManager model = new ServerManager();
+        private IServerManager serverManager = new ServerManager();
 
         // GET: api/Servers
         [HttpGet]
         public IEnumerable<Server> GetAllExternalServers()
         {
-            return this.model.getAllExternalServers();
+            return this.serverManager.getAllExternalServers();
         }
 
         // GET: api/Servers/5
@@ -26,21 +25,21 @@ namespace FlightControlWeb.Controllers
 
         public Server GetServer(string serverID)
         {
-            return this.model.getServer(serverID);
+            return this.serverManager.getServer(serverID);
         }
 
         // POST: api/Servers
         [HttpPost]
         public void AddNewServer(Server newServer)
         {
-            this.model.addNewServer(newServer);
+            this.serverManager.addNewServer(newServer);
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{serverID}")]
         public void DeleteServer(string serverID)
         {
-            this.model.deleteServer(serverID);
+            this.serverManager.deleteServer(serverID);
         }
     }
 }

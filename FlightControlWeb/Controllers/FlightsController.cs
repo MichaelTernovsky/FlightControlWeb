@@ -1,37 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FlightControlWeb.Model;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using FlightControlWeb.Model.ConcreteObjects;
+using FlightControlWeb.Model.Interfaces;
+using FlightControlWeb.Model.Managers;
 
 namespace FlightControlWeb.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class FlightsController : ControllerBase
     {
-        private IFlightManager model = new FlightManager();
+        private IFlightManager flightsModel = new FlightManager();
+        private IFlightPlanManager flihtPlansModel = new FlightPlanManager();
 
-        // GET: api/Flights
+        // GET: api/Flights?relative_to=<DATE_TIME> OR api/Flights?relative_to=<DATE_TIME>&sync_all
         [HttpGet]
-        public IEnumerable<Flight> GetAllFlights()
+        public IEnumerable<Flight> GetAllFlights(DateTime relative_to)
         {
-            return this.model.getAllFlights();
+            string requestStr = Request.QueryString.Value;
+            bool isExternal = requestStr.Contains("sync_all");
+
+            // return the correct list according to the "sync_all"
+            if (isExternal)
+                return this.flightsModel.getAllFlights();
+            else
+                return this.flightsModel.getAllInternalFlights();
         }
 
-
-        // two get methods - how to use them ?
-
-
-        /* 
-        // GET: api/Flight
-        [HttpGet]
-        public IEnumerable<Flight> GetAllInternalFlights()
+        // DELETE: api/ApiWithActions/5
+        [HttpDelete("{id}")]
+        public void DeleteFlightPlan(string id)
         {
-            return this.model.getAllInternalFlights();
+            this.flightsModel.deleteFlightPlan(id);
+            this.flihtPlansModel.deleteFlightPlan(id);
         }
-        */
     }
 }
