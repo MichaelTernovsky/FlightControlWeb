@@ -11,7 +11,7 @@ namespace FlightControlWeb.Model
     public interface IFlightPlanManager
     {
         void addNewFlightPlan(FlightPlan newFlightPlan);
-        FlightPlan getFlightPlan(int flight_id);
-        void deleteFlightPlan(int flight_id);
+        FlightPlan getFlightPlan(string flight_id);
+        void deleteFlightPlan(string flight_id);
     }
 }
