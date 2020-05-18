@@ -16,6 +16,20 @@ namespace FlightControlWeb.Model.Managers
                     {
             new Flight{ Flight_ID="1",Longitude=1,Latitude=1,Passengers=1,Company_Name="1",Date_Time=new DateTime(),Is_External=false},
             new Flight{ Flight_ID="2",Longitude=2,Latitude=2,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="3",Longitude=30,Latitude=300,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="4",Longitude=4,Latitude=44,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="5",Longitude=5,Latitude=554,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="6",Longitude=254,Latitude=265,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="7",Longitude=223,Latitude=225,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="8",Longitude=356,Latitude=765,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="9",Longitude=100,Latitude=100,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="10",Longitude=200,Latitude=200,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="11",Longitude=167,Latitude=237,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="12",Longitude=900,Latitude=700,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="13",Longitude=578,Latitude=500,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="14",Longitude=897,Latitude=798,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="15",Longitude=70,Latitude=10,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
+            new Flight{ Flight_ID="16",Longitude=124,Latitude=984,Passengers=1,Company_Name="2",Date_Time=new DateTime(),Is_External=true},
             };
 
         public IEnumerable<Flight> getAllFlights()

@@ -36,7 +36,7 @@
     <title> Project </title>
 </head>
 <body>
-    <div class="container-fluid d-flex flex-column" style="border: 1px solid green; height: 700px;">
+    <div class="container-fluid d-flex flex-column" style="border: 1px solid green; height: 100%; overflow:auto"><!-- HOW TO USE: overflow:auto-->
         <div class="row flex-fill" style="height: 100%;">
             <div class="col-8 my-col">
                 <div class="row" style="border: 1px solid red; height: 80%;">
@@ -44,43 +44,56 @@
                         <div id="map"> </div>
                     </div>
                 </div>
-                <div class="row" style="border: 1px solid red; height: 20%; ">
-                    Flight Details
+                <div class="row" style="border: 1px solid red; height: 20%; overflow:auto">
+                    <div class="row text-center " style="overflow:auto">
+                        <h5>Flight Details</h5>
+                        <table class="table table-responsive table-hover" id="tblDitails">
+                            <thead>
+                                <tr>
+                                    <th>Flight ID</th>
+                                    <th>Longitude</th>
+                                    <th>Latitude</th>
+                                    <th>Passengers</th>
+                                    <th>Company Name</th>
+                                    <th>Date Time</th>
+                                    <th>Is External</th>
+                                    <th> </th>
+                                </tr>
+                            </thead>
+
+                        </table>
+                    </div>
                 </div>
             </div>
             <div class="col-4 my-col">
-                <div class="row text-center my-row">
-                    <form id="myForm" class="form" style="margin: auto">
-                        <h5 style="text-align:center"> Add New Server</h5>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="ServerId">ServerId</label>
-                                    <input type="text" name="ServerId" id="ServerId" class="form-control" />
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="ServerURL">ServerURL</label>
-                                    <input type="text" name="ServerURL" id="ServerURL" class="form-control" />
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit">Add Server</button>
-                    </form>
-                    <table class="table table-responsive table-hover" id="tblServer">
+                <div class="row text-center my-row" style="overflow:auto">
+                    <table class="table table-responsive table-hover" id="tblFlights">
                         <thead>
                             <tr>
-                                <th>ServerID</th>
-                                <th>ServerURL</th>
+                                <th>Flight ID</th>
+                                <th>Airline</th>
+                                <th>Is External</th>
+                                <th> </th>
                             </tr>
                         </thead>
 
                     </table>
                 </div>
-                <div class="row my-row">
+                <div class="row my-row" style="overflow:auto">
                     <h4 class="text-center">External Flights</h4>
 
+                    <!--TEST DRUG AND DROP!-->
+                    <div id="drop-area">
+                        <form class="my-form">
+                            <progress id="progress-bar" max=100 value=0></progress>
+                            <div id="gallery"></div>
+                            <p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>
+                            <input type="file" id="fileElem" multiple accept="JSON/*" onchange="handleFiles(this.files)">
+                            <label class="button" for="fileElem">Select some files</label>
+                        </form>
+                    </div>
+
+                    <!--TEST DRUG AND DROP!-->
 
                     <table class="table table-responsive table-hover" id="externalFlightsTbl">
                         <thead>
@@ -98,7 +111,7 @@
         </div>
     </div>
 
-     <!-- Send Data of Server Scrip-->
+    <!-- Send Data of Server Scrip-->
     <script>
         var formData = JSON.stringify($("#myForm").serializeArray());
         $.ajax({
@@ -110,42 +123,136 @@
             contentType: "application/json"
         });
     </script>
-    
-    <!--Mao Scripts-->
+
+
+    <!-- Getting Flight Data From Server And Add It To Tables And Map Script-->
+    <script src="../Scripts/jquery.min.js"></script>
     <script>
+        /*create map 
+         */
         var map = L.map('map').setView([0, 0], 1);
         L.tileLayer('https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=z9JRmQouqskUAwB0autN', {
             attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
         }).addTo(map);
-        var leafletIcon = L.icon({
-            iconUrl: 'https://img.icons8.com/color/48/000000/penis.png',
-            shadowUrl: 'https://leafletjs.com/examples/custom-icons/leaf-shadow.png',
-            iconSize: [48, 60],
-            iconAnchor: [22, 94],
-            shadowAnchor: [4, 62],
-            popupAnchor: [12, -90]
+        //icon
+        var iconPlane = L.icon({
+            iconUrl: 'https://img.icons8.com/color/48/000000/airplane-mode-on.png',
+            iconSize: [28, 40],
+            iconAnchor: [0, 0],
+            popupAnchor: [0, 0]
         })
-        var marker = L.marker([51.5, -0.09], { icon: leafletIcon }).addTo(map);
-        var circle = L.circle([51.508, -0.11], {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.5,
-            radius: 500
-        }).addTo(map);
-        circle.bindPopup("<b> Hey Michael!</b><br> Im a Circle MotherFucker!").openPopup();
-        marker.bindPopup("<b> Hey Michael!</b><br> Im a Dick Marker MotherFucker!").openPopup();
+        /*use the data from the server to fill the tables and mark the map.
+         */
+        var url = "api/Flights?relative_to=2020-12-26T23:56:21&sync_all";
+        $.getJSON(url, function (data) {
+            console.log(data);
+            data.forEach(function (flight) {
+                //fill the tables:
+                $("#tblFlights").append("<tr><td>" + flight.flight_ID + "</td>" + "<td>" + flight.company_Name + "</td>" + "<td>" + flight.is_External + "</td>" +"<td><input type=\"button\" value=\"Delete\"></td></tr>");
+                $("#tblDitails").append("<tr><td>" + flight.flight_ID + "</td>" + "<td>" + flight.longitude + "</td>" + "<td>" + flight.latitude + "</td>" + "<td>" + flight.passengers + "</td>" + "<td>" + flight.company_Name + "</td>" + "<td>" + flight.date_Time + "</td>" + "<td>" + flight.is_External + "</td></tr>");
+                var longtitude = flight.longitude;
+                var latitude = flight.latitude;
+                //fill the map:
+                var marker = L.marker([longtitude, latitude], { icon: iconPlane }).addTo(map);
+                marker.bindPopup("<b> im a plane!</b><br> Im a Dick Marker MotherFucker!").openPopup();
+                $('table').on('click', 'input[type="button"]', function (e) {
+                    $(this).closest('tr').remove();
+                    marker.remove();//////////////////////////////////////////////////////////////////////////////////////REMOVE ALL!@$@!$#$@$
+                })
+            });
+ 
+
+        });
     </script>
 
-    <!-- Getting Data From Server Script-->
-    <script src="../Scripts/jquery.min.js"></script>
+
+    <!--drug and drop Script-->
     <script>
-        var ServerURL = "../api/Servers";
-        $.getJSON(ServerURL, function (data) {
-            console.log(data);
-            data.forEach(function (server) {
-                $("#tblServer").append("<tr><td>" + server.serverID + "</td>" + "<td>" + server.serverURL + "</td></tr>");
-            });
-        });
+        let dropArea = document.getElementById('drop-area')
+            ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false)
+            })
+
+        function preventDefaults(e) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
+
+        ;['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false)
+        })
+
+            ;['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false)
+            })
+
+        function highlight(e) {
+            dropArea.classList.add('highlight')
+        }
+
+        function unhighlight(e) {
+            dropArea.classList.remove('highlight')
+        }
+
+        dropArea.addEventListener('drop', handleDrop, false)
+
+        function handleDrop(e) {
+            let dt = e.dataTransfer
+            let files = dt.files
+
+            handleFiles(files)
+        }
+
+        function handleFiles(files) {
+            files = [...files]
+            files.forEach(uploadFile)
+            files.forEach(previewFile)
+        }
+
+
+        function uploadFile(file) {
+            var url = '../api/Servers'
+            var xhr = new XMLHttpRequest()
+            var formData = new FormData()
+            xhr.open('POST', url, true)
+
+            xhr.addEventListener('readystatechange', function (e) {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // Done. Inform the user
+                }
+                else if (xhr.readyState == 4 && xhr.status != 200) {
+                    // Error. Inform the user
+                }
+            })
+
+            formData.append('file', file)
+            xhr.send(formData)
+        }
+
+        function previewFile(file) {
+            let reader = new FileReader()
+            reader.readAsDataURL(file)
+            reader.onloadend = function () {
+                let img = document.createElement('img')
+                img.src = reader.result
+                document.getElementById('gallery').appendChild(img)
+            }
+        }
+
+        let filesDone = 0
+        let filesToDo = 0
+        let progressBar = document.getElementById('progress-bar')
+
+        function initializeProgress(numfiles) {
+            progressBar.value = 0
+            filesDone = 0
+            filesToDo = numfiles
+        }
+
+        function progressDone() {
+            filesDone++
+            progressBar.value = filesDone / filesToDo * 100
+        }
     </script>
 
 </body>
