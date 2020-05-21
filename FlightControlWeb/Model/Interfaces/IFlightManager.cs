@@ -12,9 +12,11 @@ namespace FlightControlWeb.Model.Interfaces
      */
     public interface IFlightManager
     {
-        IEnumerable<Flight> getAllInternalFlights();
-        IEnumerable<Flight> getAllFlights(); // external and internal
+        IEnumerable<Flight> getAllInternalFlights(DateTime relative_to);
+        Task<IEnumerable<Flight>> getAllFlights(DateTime relative_to);
         void addNewFlight(Flight newFlight);
-        void deleteFlightPlan(string flight_id);
+        void deleteFlight(string flight_id);
+        public Flight createFlightByFlightPlan(FlightPlan fp);
+        public Flight isOccuringAtDateTime(FlightPlan fp, DateTime cuurentTime);
     }
 }

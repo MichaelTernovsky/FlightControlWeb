@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FlightControlWeb.Model.ConcreteObjects;
 using FlightControlWeb.Model.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace FlightControlWeb.Model.Managers
 {
@@ -11,35 +12,83 @@ namespace FlightControlWeb.Model.Managers
      */
     public class FlightPlanManager : IFlightPlanManager
     {
-        // the list of all the flights
-        private static List<FlightPlan> allFlightPlansList = new List<FlightPlan>()
-                    {
-            new FlightPlan{ Flight_ID="1",Company_Name="1",Initial_Location=new FlightInitialLocation{ Longitude=1,Latitude=1,Date_Time=new DateTime()},Segments=null },
-            new FlightPlan{ Flight_ID="2",Company_Name="2",Initial_Location=new FlightInitialLocation{ Longitude=1,Latitude=2,Date_Time=new DateTime()},Segments=null },
-            };
+        private IMemoryCache cache;
+        public FlightPlanManager(IMemoryCache cache)
+        {
+            this.cache = cache;
+        }
 
         public void addNewFlightPlan(FlightPlan newFlightPlan)
         {
+            // get the list from the cache
+            var allFlightPlansList = ((IEnumerable<FlightPlan>)cache.Get("flightPlans")).ToList();
+
             allFlightPlansList.Add(newFlightPlan);
+
+            // insert the list to the cache
+            cache.Set("flightPlans", allFlightPlansList);
         }
 
         public void deleteFlightPlan(string flight_id)
         {
+            // get the list from the cache
+            var allFlightPlansList = ((IEnumerable<FlightPlan>)cache.Get("flightPlans")).ToList();
+
             FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.Flight_ID, flight_id)).FirstOrDefault();
             if (fp != null)
                 allFlightPlansList.Remove(fp);
+
+            // insert the list to the cache
+            cache.Set("flightPlans", allFlightPlansList);
         }
 
         public FlightPlan getFlightPlan(string flight_id)
         {
+            // get the list from the cache
+            var allFlightPlansList = ((IEnumerable<FlightPlan>)cache.Get("flightPlans")).ToList();
+
             FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.Flight_ID, flight_id)).FirstOrDefault();
+
+            // insert the list to the cache
+            cache.Set("flightPlans", allFlightPlansList);
+
             return fp;
         }
 
-        // checking if the current id already exists in the list
+        public string generateFlight_Id(string companyName)
+        {
+            bool isGoodKey = true;
+            string flight_id = "";
+
+            // creating the special id for both Flight and FlighPlan
+            while (isGoodKey == true)
+            {
+                flight_id += companyName;
+
+                Random r = new Random();
+                int number = r.Next(1, 1000);
+                flight_id += number.ToString();
+
+                if (this.isIdExist(flight_id) == 0)
+                {
+                    // the key does not exist - the key is good
+                    isGoodKey = false;
+                }
+                else
+                    flight_id = "";
+            }
+
+            return flight_id;
+        }
         public int isIdExist(string flight_id)
         {
+            // get the list from the cache
+            var allFlightPlansList = ((IEnumerable<FlightPlan>)cache.Get("flightPlans")).ToList();
+
             FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.Flight_ID, flight_id)).FirstOrDefault();
+
+            // insert the list to the cache
+            cache.Set("flightPlans", allFlightPlansList);
 
             if (fp == null)
                 return 0;

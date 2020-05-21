@@ -26,6 +26,22 @@
     ServerID: <input type="text" /><br />
     ServerURL: <input type="text" /><br />
     <button id="btnAddServer">Add Server</button>
+    <script id="addbtn">
+        const button = document.getElementById('btnAddServer');
+        button.addEventListener('click', async _ => {
+            try {
+                const response = await fetch('yourUrl', {
+                    method: 'post',
+                    body: {
+                        
+                    }
+                });
+                console.log('Completed!', response);
+            } catch (err) {
+                console.error(`Error: ${err}`);
+            }
+        });
+    </script>
     <h2>Server Table</h2>
     <table id="tblServer">
         <thead>
@@ -48,7 +64,7 @@
 
 
     <script src="../Scripts/jquery.min.js"></script>
-    <script>
+    <script id="addServer">
         var ServerURL = "../api/Servers";
         $.getJSON(ServerURL, function (data) {
             console.log(data);

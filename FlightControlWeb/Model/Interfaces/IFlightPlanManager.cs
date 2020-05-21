@@ -15,6 +15,7 @@ namespace FlightControlWeb.Model.Interfaces
         void addNewFlightPlan(FlightPlan newFlightPlan);
         FlightPlan getFlightPlan(string flight_id);
         void deleteFlightPlan(string flight_id);
+        string generateFlight_Id(string companyName);
         int isIdExist(string flight_id);
     }
 }

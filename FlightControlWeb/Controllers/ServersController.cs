@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using FlightControlWeb.Model.ConcreteObjects;
 using FlightControlWeb.Model.Interfaces;
 using FlightControlWeb.Model.Managers;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace FlightControlWeb.Controllers
 {
@@ -11,7 +12,14 @@ namespace FlightControlWeb.Controllers
     [Route("api/[controller]")]
     public class ServersController : ControllerBase
     {
-        private IServerManager serverManager = new ServerManager();
+        private IMemoryCache cache;
+        private IServerManager serverManager;
+
+        public ServersController(IMemoryCache cache)
+        {
+            this.cache = cache;
+            serverManager = new ServerManager(this.cache);
+        }
 
         // GET: api/Servers
         [HttpGet]
