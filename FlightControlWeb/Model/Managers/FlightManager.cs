@@ -127,7 +127,7 @@ namespace FlightControlWeb.Model.Managers
 
             // currTime - inital time of the i segment
             TimeSpan passedTime = cuurentTime - (initalTime.AddSeconds(-1 * (segCurr.TimeSpan_Seconds)));
-            double div = passedTime.Seconds / segCurr.TimeSpan_Seconds;
+            double div = (passedTime.TotalSeconds) / segCurr.TimeSpan_Seconds;
 
             double startLon, startLat, endLon, endLat;
             // limit case - segment i is the first segment, this the prev is the inital

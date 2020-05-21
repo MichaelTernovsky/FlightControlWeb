@@ -36,7 +36,8 @@
     <title> Project </title>
 </head>
 <body>
-    <div class="container-fluid d-flex flex-column" style="border: 1px solid green; height: 100%; overflow:auto"><!-- HOW TO USE: overflow:auto-->
+    <div class="container-fluid d-flex flex-column" style="border: 1px solid green; height: 100%; overflow:auto">
+        <!-- HOW TO USE: overflow:auto-->
         <div class="row flex-fill" style="height: 100%;">
             <div class="col-8 my-col">
                 <div class="row" style="border: 1px solid red; height: 80%;">
@@ -113,7 +114,7 @@
 
     <!-- Getting Flight Data From Server And Add It To Tables And Map Script-->
     <script>
-        /*create map 
+        /*create map
          */
         var map = L.map('map').setView([0, 0], 1);
         L.tileLayer('https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=z9JRmQouqskUAwB0autN', {
@@ -126,16 +127,17 @@
             iconAnchor: [0, 0],
             popupAnchor: [0, 0]
         })
-        /*use the data from the server to fill the tables and mark the map.
+        /*
+         * use the data from the server to fill the tables and mark the map.
          */
-        var url = "api/Flights?relative_to=2020-12-26T23:56:21&sync_all";
+        var url = "api/Flights?relative_to=2020-12-27T01:56:21&sync_all";
         $.getJSON(url, function (data) {
             console.log(data);
             //list of markers
             let flightMap = new Map();
             data.forEach(function (flight) {
                 //fill the tables:
-                $("#tblFlights").append("<tr><td>" + flight.flight_ID + "</td>" + "<td>" + flight.company_Name + "</td>" + "<td>" + flight.is_External + "</td>" +"<td><input type=\"button\" value=\"Delete\"></td></tr>");
+                $("#tblFlights").append("<tr><td>" + flight.flight_ID + "</td>" + "<td>" + flight.company_Name + "</td>" + "<td>" + flight.is_External + "</td>" + "<td><input type=\"button\" value=\"Delete\"></td></tr>");
                 var longtitude = flight.longitude;
                 var latitude = flight.latitude;
                 var flightid = flight.flight_ID;
@@ -162,11 +164,8 @@
                     $(this).closest('tr').remove();
                 })
             });
- 
-
         });
     </script>
-
 
     <!--drug and drop Script-->
     <script>
@@ -210,7 +209,6 @@
             files.forEach(uploadFile)
             files.forEach(previewFile)
         }
-
 
         function uploadFile(file) {
             var url = '../api/Servers'
