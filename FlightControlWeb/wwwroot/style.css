@@ -1,0 +1,57 @@
+﻿.grid-container {
+    border-style: solid;
+    border-width: 1px;
+    position: absolute;
+    display: grid;
+    grid-template-columns: 65% 35%;
+    grid-template-rows: 50% 30% 20%;
+    background: rgba(40, 230, 242, 0.20);
+    top: 55px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+}
+
+.component {
+    border-style: solid;
+    border-width: 3px;
+}
+
+.head {
+    text-align: center;
+}
+
+.map {
+    grid-column: 1;
+    grid-row: 1/3;
+}
+
+.info {
+    grid-column: 1;
+    grid-row: 3;
+    overflow: auto;
+}
+
+.list_in {
+    grid-column: 2;
+    grid-row: 1;
+    overflow: auto;
+}
+
+.list_out {
+    grid-column: 2;
+    grid-row: 2/4;
+    overflow: auto;
+}
+
+.internal_header {
+    text-align: center;
+}
+
+.external_header {
+    text-align: center;
+}
+
+.flight_details_header {
+    text-align: center;
+}

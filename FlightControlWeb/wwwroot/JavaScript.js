@@ -2,14 +2,14 @@
 
 function getFlightData() {
     /*create map*/
-    var map = L.map('map').setView([0, 0], 1);
+    var map = L.map('map').setView([34.873331,32.006333], 1.5);
     L.tileLayer('https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=z9JRmQouqskUAwB0autN', {
         attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
     }).addTo(map);
     //icon
     var iconPlane = L.icon({
         iconUrl: 'https://img.icons8.com/color/48/000000/airplane-mode-on.png',
-        iconSize: [28, 40],
+        iconSize: [50, 40],
         iconAnchor: [0, 0],
         popupAnchor: [0, 0]
     })
@@ -33,12 +33,12 @@ function getFlightData() {
             flightMap.set(flightid, marker);
             function onClick(e) {
                 //remove the old details
-                var count = $('#tblDitails tr').length;
+                var count = $('#tblDetails tr').length;
                 if (count > 1) {
-                    document.getElementById("tblDitails").deleteRow(1);
+                    document.getElementById("tblDetails").deleteRow(1);
                 }
                 //write the new details
-                $("#tblDitails").append("<tr><td>" + flight.flight_ID + "</td>" + "<td>" + flight.longitude + "</td>" + "<td>" + flight.latitude + "</td>" + "<td>" + flight.passengers + "</td>" + "<td>" + flight.company_Name + "</td>" + "<td>" + flight.date_Time + "</td>" + "<td>" + flight.is_External + "</td></tr>");
+                $("#tblDetails").append("<tr><td>" + flight.flight_ID + "</td>" + "<td>" + flight.longitude + "</td>" + "<td>" + flight.latitude + "</td>" + "<td>" + flight.passengers + "</td>" + "<td>" + flight.company_Name + "</td>" + "<td>" + flight.date_Time + "</td>" + "<td>" + flight.is_External + "</td></tr>");
             }
             marker.bindPopup(flightid);
             marker.addTo(map)
