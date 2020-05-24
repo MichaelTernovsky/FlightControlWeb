@@ -29,8 +29,10 @@ function clearTables() {
 }
 
 function deleteFromServer(flightID) {
-    var url = "api/Flights/" + flightID;
-    $.deleteFromServer(flightID);
+    $.ajax({
+        type: "DELETE",
+        url: "api/Flights/" + flightID
+    });
 }
 
 function getFlightData() {
@@ -55,7 +57,7 @@ function getFlightData() {
             }
             else {
                 // all internal flights
-                $("#tblExternalFlights").append("<tr><td>" + flight.flight_id + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.is_external + "</td>" + "<td><input type=\"button\" value=\"Delete\"></td></tr>");
+                $("#tblExternalFlights").append("<tr><td>" + flight.flight_id + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.is_external + "</td>" + "</tr > ");
             }
 
             data.forEach(function (flight) {
@@ -85,9 +87,12 @@ function getFlightData() {
                 $('table').on('click', 'input[type="button"]', function (e) {
                     var r = (this).closest('tr');
                     var id = r.cells.item(0).innerHTML;
-                    flightMap.get(id).remove(); // true
-                    flightMap.delete(id); // true
+                    flightMap.get(id).remove();
+                    flightMap.delete(id);
                     $(this).closest('tr').remove();
+
+                    // delete from server
+                    deleteFromServer(id);
                 })
             });
         });
