@@ -1,5 +1,4 @@
-﻿// Getting Flight Data From Server And Add It To Tables And Map Script
-
+﻿// global map
 var map;
 
 function createMap() {
@@ -44,7 +43,7 @@ function getFlightData() {
 
     $.getJSON(url, function (data) {
         //list of markers
-        let flightMap = new Map();
+        let markersMap = new Map();
 
         // clear the table
         clearTables();
@@ -69,7 +68,7 @@ function getFlightData() {
                 //fill the map:
                 var marker = L.marker([longtitude, latitude], { icon: iconPlane }).on('click', onClick);
                 marker.id = flightid;
-                flightMap.set(flightid, marker);
+                markersMap.set(flightid, marker);
 
                 function onClick(e) {
                     //remove the old details
@@ -87,8 +86,12 @@ function getFlightData() {
                 $('table').on('click', 'input[type="button"]', function (e) {
                     var r = (this).closest('tr');
                     var id = r.cells.item(0).innerHTML;
-                    flightMap.get(id).remove();
-                    flightMap.delete(id);
+
+                    // delete the marker's image
+                    markersMap.get(id).remove();
+                    // delete the marker's object from the map
+                    markersMap.delete(id);
+
                     $(this).closest('tr').remove();
 
                     // delete from server
