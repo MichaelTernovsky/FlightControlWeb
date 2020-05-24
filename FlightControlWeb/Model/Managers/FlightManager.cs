@@ -55,7 +55,7 @@ namespace FlightControlWeb.Model.Managers
                     // adding the new flights to our list
                     foreach (Flight flight in outerFlights)
                     {
-                        flight.Is_External = true;
+                        flight.IsExternal = true;
                         serversFlightsList.Add(flight);
                     }
                 }
@@ -80,9 +80,9 @@ namespace FlightControlWeb.Model.Managers
 
             foreach (Flight f in allFlightsList)
             {
-                FlightPlan fp = flightPlanModel.getFlightPlan(f.Flight_ID);
+                FlightPlan fp = flightPlanModel.getFlightPlan(f.FlightID);
 
-                if (f.Is_External == false)
+                if (f.IsExternal == false)
                 {
                     // the flight is good for the current time
                     Flight newFlight = isOccuringAtDateTime(fp, relative_to);
@@ -96,9 +96,9 @@ namespace FlightControlWeb.Model.Managers
 
         public Flight isOccuringAtDateTime(FlightPlan fp, DateTime cuurentTime)
         {
-            DateTime initalTime = fp.Initial_Location.Date_Time;
+            DateTime initalTime = fp.InitialLocation.DateTime;
             Flight newFlight = null;
-            FlightSegment segCurr = null, segPrev = null;
+            Segment segCurr = null, segPrev = null;
             bool isGoodSegments = false;
 
             // the flight is already ended
@@ -106,9 +106,9 @@ namespace FlightControlWeb.Model.Managers
                 return null;
 
             // run over the segments
-            foreach (FlightSegment segment in fp.Segments)
+            foreach (Segment segment in fp.Segments)
             {
-                initalTime = initalTime.AddSeconds(segment.TimeSpan_Seconds);
+                initalTime = initalTime.AddSeconds(segment.TimeSpanSeconds);
 
                 if (initalTime >= cuurentTime)
                 {
@@ -126,15 +126,15 @@ namespace FlightControlWeb.Model.Managers
             }
 
             // currTime - inital time of the i segment
-            TimeSpan passedTime = cuurentTime - (initalTime.AddSeconds(-1 * (segCurr.TimeSpan_Seconds)));
-            double div = (passedTime.TotalSeconds) / segCurr.TimeSpan_Seconds;
+            TimeSpan passedTime = cuurentTime - (initalTime.AddSeconds(-1 * (segCurr.TimeSpanSeconds)));
+            double div = (passedTime.TotalSeconds) / segCurr.TimeSpanSeconds;
 
             double startLon, startLat, endLon, endLat;
             // limit case - segment i is the first segment, this the prev is the inital
             if (segPrev == null)
             {
-                startLon = fp.Initial_Location.Longitude;
-                startLat = fp.Initial_Location.Latitude;
+                startLon = fp.InitialLocation.Longitude;
+                startLat = fp.InitialLocation.Latitude;
                 endLon = segCurr.Longitude;
                 endLat = segCurr.Latitude;
             }
@@ -147,8 +147,8 @@ namespace FlightControlWeb.Model.Managers
             }
 
             double pathLength = Math.Sqrt(Math.Pow((endLat - startLat), 2) + Math.Pow((endLon - startLon), 2));
-            double newLon = fp.Initial_Location.Longitude + pathLength;
-            double newLat = fp.Initial_Location.Latitude + pathLength;
+            double newLon = fp.InitialLocation.Longitude + pathLength;
+            double newLat = fp.InitialLocation.Latitude + pathLength;
 
             // creating the new flight
             newFlight = createFlightByFlightPlan(fp);
@@ -159,7 +159,7 @@ namespace FlightControlWeb.Model.Managers
         }
         public Flight createFlightByFlightPlan(FlightPlan fp)
         {
-            Flight newFlight = new Flight { Flight_ID = fp.Flight_ID, Longitude = fp.Initial_Location.Latitude, Latitude = fp.Initial_Location.Longitude, Passengers = fp.Passengers, Company_Name = fp.Company_Name, Date_Time = fp.Initial_Location.Date_Time, Is_External = false };
+            Flight newFlight = new Flight { FlightID = fp.FlightID, Longitude = fp.InitialLocation.Latitude, Latitude = fp.InitialLocation.Longitude, Passengers = fp.Passengers, CompanyName = fp.CompanyName, DateTime = fp.InitialLocation.DateTime, IsExternal = false };
 
             return newFlight;
         }
@@ -180,7 +180,7 @@ namespace FlightControlWeb.Model.Managers
             // get the list from the cache
             var allFlightsList = ((IEnumerable<Flight>)cache.Get("flights")).ToList();
 
-            Flight f = allFlightsList.Where(x => String.Equals(x.Flight_ID, flight_id)).FirstOrDefault();
+            Flight f = allFlightsList.Where(x => String.Equals(x.FlightID, flight_id)).FirstOrDefault();
             if (f != null)
                 allFlightsList.Remove(f);
 

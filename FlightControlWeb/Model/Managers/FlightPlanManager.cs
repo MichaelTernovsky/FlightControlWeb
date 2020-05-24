@@ -34,7 +34,7 @@ namespace FlightControlWeb.Model.Managers
             // get the list from the cache
             var allFlightPlansList = ((IEnumerable<FlightPlan>)cache.Get("flightPlans")).ToList();
 
-            FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.Flight_ID, flight_id)).FirstOrDefault();
+            FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.FlightID, flight_id)).FirstOrDefault();
             if (fp != null)
                 allFlightPlansList.Remove(fp);
 
@@ -47,7 +47,7 @@ namespace FlightControlWeb.Model.Managers
             // get the list from the cache
             var allFlightPlansList = ((IEnumerable<FlightPlan>)cache.Get("flightPlans")).ToList();
 
-            FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.Flight_ID, flight_id)).FirstOrDefault();
+            FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.FlightID, flight_id)).FirstOrDefault();
 
             // insert the list to the cache
             cache.Set("flightPlans", allFlightPlansList);
@@ -85,7 +85,7 @@ namespace FlightControlWeb.Model.Managers
             // get the list from the cache
             var allFlightPlansList = ((IEnumerable<FlightPlan>)cache.Get("flightPlans")).ToList();
 
-            FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.Flight_ID, flight_id)).FirstOrDefault();
+            FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.FlightID, flight_id)).FirstOrDefault();
 
             // insert the list to the cache
             cache.Set("flightPlans", allFlightPlansList);

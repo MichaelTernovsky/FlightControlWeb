@@ -12,7 +12,6 @@
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
 
     <script src="JavaScript.js"></script>
-    <link rel="stylesheet" href="myStyle.css">
     <title>Web Flight Control</title>
 </head>
 <body>
@@ -24,8 +23,7 @@
         </div>
 
         <div id="info" class="component info">
-            <h4 class="flight_details_header">Flight Details</h4>
-            <br />
+            <h3 class="flight_details_header">Flight Details</h3>
             <div class="row text-center">
                 <table class="table selected_details_table" id="tblDetails">
                     <thead>
@@ -48,11 +46,11 @@
             <h3 class="internal_header">Internal Flights</h3>
             <br />
             <div class="row text-center my-row">
-                <table class="table internal_details_table" id="tblFlights">
+                <table class="table internal_details_table" id="tblInternalFlights">
                     <thead>
                         <tr>
                             <th>Flight ID</th>
-                            <th>Airline</th>
+                            <th>Company Name</th>
                             <th>Is External</th>
                             <th> </th>
                         </tr>
@@ -62,7 +60,7 @@
 
             <br /><br /><br /><br />
 
-            <div class="row my-row">
+            <div class="row dropBox">
                 <!--TEST DRUG AND DROP!-->
                 <div id="drop-area">
                     <form class="my-form">
@@ -73,19 +71,6 @@
                         <label class="button" for="fileElem">Select some files</label>
                     </form>
                 </div>
-
-                <!--TEST DRUG AND DROP!-->
-                <table class="table table-responsive table-hover" id="externalFlightsTbl">
-                    <thead>
-                        <tr>
-                            <th>Flight ID</th>
-                            <th>Arrival Time</th>
-                            <th>Airline</th>
-                        </tr>
-                    </thead>
-                    <tbody id="externalFlightsBody">
-                    </tbody>
-                </table>
             </div>
         </div>
 
@@ -93,11 +78,11 @@
             <h3 class="external_header">External Flights</h3>
             <br />
             <div class="row text-center my-row">
-                <table class="table external_header" id="tblFlights">
+                <table class="table external_header" id="tblExternalFlights">
                     <thead>
                         <tr>
                             <th>Flight ID</th>
-                            <th>Airline</th>
+                            <th>Company Name</th>
                             <th>Is External</th>
                             <th> </th>
                         </tr>
@@ -108,8 +93,8 @@
         </div>
     </div>
 
-
-    <script>getFlightData();</script>
+    <script> createMap();</script>
+    <script>setInterval(getFlightData, 1000);</script>
 
     <!--drug and drop Script-->
     <script>

@@ -33,14 +33,14 @@ namespace FlightControlWeb.Controllers
         [HttpPost]
         public void AddNewFlightPlan(FlightPlan newFlightPlan)
         {
-            string flight_id = this.flihtPlansModel.generateFlight_Id(newFlightPlan.Company_Name);
+            string flight_id = this.flihtPlansModel.generateFlight_Id(newFlightPlan.CompanyName);
 
             // adding the id also for the fligh plan
-            newFlightPlan.Flight_ID = flight_id;
+            newFlightPlan.FlightID = flight_id;
 
             // creating the flight object from the flight plan
             Flight newFlight = flightsModel.createFlightByFlightPlan(newFlightPlan);
-            newFlight.Is_External = false;
+            newFlight.IsExternal = false;
 
             // adding the new flight to the list
             this.flightsModel.addNewFlight(newFlight);
