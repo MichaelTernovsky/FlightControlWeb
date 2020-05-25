@@ -1,6 +1,28 @@
 ﻿// global map
 var map;
 
+function drawLine(id) {
+    var marray = [];
+    flightPlanUrl = "/api/FlightPlan/"
+    $.getJSON(flightPlanUrl + id, function (data) {
+        
+        data.segments.forEach(function (seg) {
+            var longitude = seg.longitude;
+            var latitude = seg.latitude;
+            var coordinates = [parseFloat(longitude), parseFloat(latitude)];
+            marray.push(coordinates);
+
+        })
+    });
+    //marray.push([20, 30.2]);
+    //marray.push([100, 350]);
+    console.log(marray);
+
+    //var layerGroup = L.layerGroup().addTo(map);
+    var polyline = L.polyline(marray, { color: 'red' }).addTo(map);
+   // polyline.addTo(layerGroup);
+            }
+
 function createMap() {
     /*create map*/
     map = L.map('map').setView([34.873331, 32.006333], 1.5);
@@ -62,6 +84,8 @@ function deleteFlight() {
 }
 
 function addRowAndMarkerOnClick(flight, i, marker) {
+
+
     // create onclick to each row
     var table = document.getElementById("tblInternalFlights");
     var currentRow = table.rows[i];
@@ -77,6 +101,9 @@ function addRowAndMarkerOnClick(flight, i, marker) {
 
             if (this != marker)
                 marker.bindPopup(flight.flight_id).openPopup();
+
+            //check draw line function
+            drawLine(flight.flight_id);
         };
     };
     // adding the onclick method to the row
@@ -97,9 +124,10 @@ function getFlightData() {
     //var url = "api/Flights?relative_to=" + date + "sync_all";
 
     //use the data from the server to fill the tables and mark the map 
-    var url = "api/Flights?relative_to=2020-12-27T01:56:21&sync_all";
+    var url = "api/Flights?relative_to=";
+    var currentDate = "2020-12-27T01:56:21";
 
-    $.getJSON(url, function (data) {
+    $.getJSON(url + currentDate +"&sync_all", function (data) {
         //list of markers
         let markersMap = new Map();
 
