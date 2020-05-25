@@ -118,7 +118,7 @@ function getFlightData() {
             marker.id = flightid;
             markersMap.set(flightid, marker);
 
-            // adding onclick to each row
+            // adding the same onclick method to row and marker of each flight
             addRowAndMarkerOnClick(flight, i, marker);
             i++;
 
