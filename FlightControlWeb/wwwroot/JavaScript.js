@@ -74,6 +74,9 @@ function addRowAndMarkerOnClick(flight, i, marker) {
             }
             //write the new details
             $("#tblDetails").append("<tr><td>" + flight.flight_id + "</td>" + "<td>" + flight.longitude + "</td>" + "<td>" + flight.latitude + "</td>" + "<td>" + flight.passengers + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.date_time + "</td>" + "<td>" + flight.is_external + "</td></tr>");
+
+            if (this != marker)
+                marker.bindPopup(flight.flight_id).openPopup();
         };
     };
     // adding the onclick method to the row
