@@ -1,5 +1,6 @@
 ﻿// global map
 var map;
+var globFlight;
 
 function createMap() {
     /*create map*/
@@ -35,42 +36,62 @@ function deleteFromServer(flightID) {
 }
 
 function getFlightData() {
+
+
+
     //creating the icon
     var iconPlane = createIcon();
 
     //use the data from the server to fill the tables and mark the map 
-    var url = "api/Flights?relative_to=2020-12-27T01:56:21&sync_all";
+    var url = "api/Flights?relative_to=";
+    var currentTime = "2020-12-27T01:56:21";
 
-    $.getJSON(url, function (data) {
-        //list of markers
-        let markersMap = new Map();
+    //list of markers
+    let markersMap = new Map();
 
+
+    $.getJSON(url + currentTime + "&sync_all", function (data) {
         // clear the table
         clearTables();
-
+      
+   
         data.forEach(function (flight) {
+            globFlight = flight;
             // show the flights
             if (flight.is_external == false) {
                 // all external flights
-                $("#tblInternalFlights").append("<tr><td>" + flight.flight_id + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.is_external + "</td>" + "<td><input type=\"button\" value=\"Delete\"></td></tr>");
+                $("#tblInternalFlights").append("<tr class=\"tableRow\" onclick=onClick()><td>" + flight.flight_id + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.is_external + "</td>" + "<td><input type=\"button\" value=\"Delete\"></td></tr>");
             }
             else {
                 // all internal flights
-                $("#tblExternalFlights").append("<tr><td>" + flight.flight_id + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.is_external + "</td>" + "</tr > ");
+                $("#tblExternalFlights").append("<tr class=\"tableRow\" onclick=onClick2()><td>" + flight.flight_id + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.is_external + "</td>" + "</tr > ");
+            }
+            // saving the values
+            var longtitude = flight.longitude;
+            var latitude = flight.latitude;
+            var flightid = flight.flight_id;
+
+                                      //test path line//
+
+            var x = 40.444;
+            var y = 74.333;
+            // var point A = new L.LatLng(x, y);
+         //   var layerGroup = L.layerGroup().addTo(map);
+            function drawline(marray) {
+                var polyline = L.polyline(marray, {color: 'red'}).addTo(map);
+                polyline.addTo(layerGroup);
             }
 
-            data.forEach(function (flight) {
-                // saving the values
-                var longtitude = flight.longitude;
-                var latitude = flight.latitude;
-                var flightid = flight.flight_id;
+
+                                     //test path line//
 
                 //fill the map:
                 var marker = L.marker([longtitude, latitude], { icon: iconPlane }).on('click', onClick);
                 marker.id = flightid;
                 markersMap.set(flightid, marker);
 
-                function onClick(e) {
+            function onClick(e) {
+                console.log("CLICK");
                     //remove the old details
                     var count = $('#tblDetails tr').length;
                     if (count > 1) {
@@ -98,6 +119,5 @@ function getFlightData() {
                     deleteFromServer(id);
                 })
             });
-        });
     });
 }

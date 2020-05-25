@@ -55,3 +55,7 @@
 .flight_details_header {
     text-align: center;
 }
+
+.tableRow:hover {
+    background-color: #73b6e6;
+}
