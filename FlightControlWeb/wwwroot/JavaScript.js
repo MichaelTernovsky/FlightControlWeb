@@ -31,11 +31,11 @@ function showFlightInTables(flight) {
     // show the flights
     if (flight.is_external == false) {
         // all external flights
-        $("#tblInternalFlights").append("<tr><td>" + flight.flight_id + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.is_external + "</td>" + "<td><input type=\"button\" value=\"Delete\"></td></tr>");
+        $("#tblInternalFlights").append("<tr class=\"tableRow\"><td>" + flight.flight_id + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.is_external + "</td>" + "<td><input type=\"button\" value=\"Delete\"></td></tr>");
     }
     else {
         // all internal flights
-        $("#tblExternalFlights").append("<tr><td>" + flight.flight_id + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.is_external + "</td>" + "</tr > ");
+        $("#tblExternalFlights").append("<tr class=\"tableRow\"><td>" + flight.flight_id + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.is_external + "</td>" + "</tr > ");
     }
 }
 
@@ -64,7 +64,6 @@ function deleteFlight() {
 function addRowOnClick(flight, i) {
     // create onclick to each row
     var table = document.getElementById("tblInternalFlights");
-    //for (i = 1; i < rows.length; i++) {
     var currentRow = table.rows[i];
     var createClickHandler = function (row) {
         return function () {
