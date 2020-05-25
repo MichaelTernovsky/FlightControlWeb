@@ -61,11 +61,11 @@ function deleteFlight() {
     })
 }
 
-function addRowOnClick(flight, i) {
+function addRowAndMarkerOnClick(flight, i, marker) {
     // create onclick to each row
     var table = document.getElementById("tblInternalFlights");
     var currentRow = table.rows[i];
-    var createClickHandler = function (row) {
+    var createClickHandler = function () {
         return function () {
             //remove the old details
             var count = $('#tblDetails tr').length;
@@ -76,7 +76,11 @@ function addRowOnClick(flight, i) {
             $("#tblDetails").append("<tr><td>" + flight.flight_id + "</td>" + "<td>" + flight.longitude + "</td>" + "<td>" + flight.latitude + "</td>" + "<td>" + flight.passengers + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.date_time + "</td>" + "<td>" + flight.is_external + "</td></tr>");
         };
     };
-    currentRow.onclick = createClickHandler(currentRow);
+    // adding the onclick method to the row
+    currentRow.onclick = createClickHandler();
+
+    // adding the onclick method to the marker
+    marker.on('click', createClickHandler());
 }
 
 function getFlightData() {
@@ -101,33 +105,24 @@ function getFlightData() {
         // show the flights in the tables
         data.forEach(function (flight) {
 
+            // showing the flights in the correct tables
             showFlightInTables(flight);
-            //addRowOnClick();
 
             // saving the values
             var longtitude = flight.longitude;
             var latitude = flight.latitude;
             var flightid = flight.flight_id;
 
-            function onClick() {
-                //remove the old details
-                var count = $('#tblDetails tr').length;
-                if (count > 1) {
-                    document.getElementById("tblDetails").deleteRow(1);
-                }
-                //write the new details
-                $("#tblDetails").append("<tr><td>" + flight.flight_id + "</td>" + "<td>" + flight.longitude + "</td>" + "<td>" + flight.latitude + "</td>" + "<td>" + flight.passengers + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.date_time + "</td>" + "<td>" + flight.is_external + "</td></tr>");
-            }
-
-            // adding onclick to each row
-            addRowOnClick(flight, i);
-            i++;
-
             //fill the map
-            var marker = L.marker([longtitude, latitude], { icon: iconPlane }).on('click', onClick);
+            var marker = L.marker([longtitude, latitude], { icon: iconPlane });
             marker.id = flightid;
             markersMap.set(flightid, marker);
 
+            // adding onclick to each row
+            addRowAndMarkerOnClick(flight, i, marker);
+            i++;
+
+            // show to flight id in the pop up
             marker.bindPopup(flightid);
             marker.addTo(map)
 
