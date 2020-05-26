@@ -149,7 +149,7 @@ function flightOnClick(e, flag) {
             })
 
             //write the new details
-            $("#tblDetails").append("<tr class=\"detailRow\"><td>" + flightPlan.flight_id + "</td>" + "<td>" + initialLat + "</td>" + "<td>" + initialLon + "</td>" + "<td>" + flightPlan.initial_location.date_time + "</td>" + "<td>" + flightPlan.passengers + "</td>" + "<td>" + flightPlan.company_name + "</td>" + "<td>" + finalLon + "</td>" + "<td>" + finalLat + "</td>" + "<td>" + endlTime + "</td>" + "<td></tr>");
+            $("#tblDetails").append("<tr class=\"detailRow\"><td>" + flightPlan.flight_id + "</td>" + "<td>" + initialLon + "</td>" + "<td>" + initialLat + "</td>" + "<td>" + flightPlan.initial_location.date_time + "</td>" + "<td>" + flightPlan.passengers + "</td>" + "<td>" + flightPlan.company_name + "</td>" + "<td>" + finalLon + "</td>" + "<td>" + finalLat + "</td>" + "<td>" + endlTime + "</td>" + "<td></tr>");
         }
     });
 }
