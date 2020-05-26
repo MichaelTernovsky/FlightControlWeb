@@ -40,6 +40,7 @@ function showFlightInTables(flight) {
 }
 
 function deleteFlight() {
+
     $('table').on('click', 'input[type="button"]', function () {
         // get the row of the delete button that pressed
         var r = (this).closest('tr');
@@ -61,10 +62,20 @@ function deleteFlight() {
     })
 }
 
-function addRowAndMarkerOnClick(flight, i, marker) {
+function addRowAndMarkerOnClick(flight, i, j, marker, is_external) {
+    var table;
+    var currentRow;
+
     // create onclick to each row
-    var table = document.getElementById("tblInternalFlights");
-    var currentRow = table.rows[i];
+    if (is_external == false) {
+        table = document.getElementById("tblInternalFlights");
+        currentRow = table.rows[i];
+    }
+    else {
+        table = document.getElementById("tblExternalFlights");
+        currentRow = table.rows[j];
+    }
+
     var createClickHandler = function () {
         return function () {
             //remove the old details
@@ -88,7 +99,7 @@ function addRowAndMarkerOnClick(flight, i, marker) {
 
 function getFlightData() {
     // assisting variable for adding onclick to each row
-    var i = 1;
+    var internalCounter = 1, externalCounter = 1;
 
     //creating the icon
     var iconPlane = createIcon();
@@ -100,6 +111,7 @@ function getFlightData() {
     var url = "api/Flights?relative_to=2020-12-27T01:56:21&sync_all";
 
     $.getJSON(url, function (data) {
+
         //list of markers
         let markersMap = new Map();
 
@@ -107,7 +119,6 @@ function getFlightData() {
         clearTables();
         // show the flights in the tables
         data.forEach(function (flight) {
-
             // showing the flights in the correct tables
             showFlightInTables(flight);
 
@@ -122,15 +133,16 @@ function getFlightData() {
             markersMap.set(flightid, marker);
 
             // adding the same onclick method to row and marker of each flight
-            addRowAndMarkerOnClick(flight, i, marker);
-            i++;
+            addRowAndMarkerOnClick(flight, internalCounter, externalCounter, marker, flight.is_external);
+
+            if (flight.is_external == false)
+                internalCounter++;
+            else
+                externalCounter++;
 
             // show to flight id in the pop up
             marker.bindPopup(flightid);
             marker.addTo(map)
-
-            // delete the flight
-            deleteFlight();
         });
     });
 }
