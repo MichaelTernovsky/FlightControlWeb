@@ -23,7 +23,11 @@ namespace FlightControlWeb.Model.Managers
             // get the list from the cache
             var allFlightPlansList = ((IEnumerable<FlightPlan>)cache.Get("flightPlans")).ToList();
 
-            allFlightPlansList.Add(newFlightPlan);
+            // get the flight by id and check if exists
+            FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.FlightID, newFlightPlan.FlightID)).FirstOrDefault();
+
+            if (fp == null)
+                allFlightPlansList.Add(newFlightPlan);
 
             // insert the list to the cache
             cache.Set("flightPlans", allFlightPlansList);

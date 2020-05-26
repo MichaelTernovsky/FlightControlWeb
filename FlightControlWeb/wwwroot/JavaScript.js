@@ -1,27 +1,29 @@
-﻿// global map
-var map;
+﻿let map;
+var layerGroup;
+var markersMap = new Object();
 
 function drawLine(id) {
     var marray = [];
     flightPlanUrl = "/api/FlightPlan/"
     $.getJSON(flightPlanUrl + id, function (data) {
-        
-        data.segments.forEach(function (seg) {
-            var longitude = seg.longitude;
-            var latitude = seg.latitude;
-            var coordinates = [parseFloat(longitude), parseFloat(latitude)];
-            marray.push(coordinates);
 
-        })
+        let arr = data.segments;
+        for (let i = 0; i < arr.length; i++) {
+            marray.push(data.segments[i]["latitude"], data.segments[i]["longitude"]);
+        }
+
+        //.forEach(function (seg) {
+        //console.log(seg["latitude"], seg["longitude"]);
+        //})
     });
-    //marray.push([20, 30.2]);
-    //marray.push([100, 350]);
+    // marray.push([20, 30.2]);
+    // marray.push([100, 350]);
     console.log(marray);
 
     //var layerGroup = L.layerGroup().addTo(map);
     var polyline = L.polyline(marray, { color: 'red' }).addTo(map);
-   // polyline.addTo(layerGroup);
-            }
+    // polyline.addTo(layerGroup);
+}
 
 function createMap() {
     /*create map*/
@@ -29,6 +31,8 @@ function createMap() {
     L.tileLayer('https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=z9JRmQouqskUAwB0autN', {
         attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
     }).addTo(map);
+
+    layerGroup = L.layerGroup().addTo(map);
 }
 
 function createIcon() {
@@ -49,77 +53,127 @@ function clearTables() {
     $('#tblExternalFlights tr:gt(0)').remove()
 }
 
+function clearFlightDetails(flightID) {
+    //remove from flight details table
+    var id = jQuery(".detailRow").find("td:eq(0)").text();
+
+    if (id == flightID) {
+        var count = $('#tblDetails tr').length;
+        if (count > 1) {
+            document.getElementById("tblDetails").deleteRow(1);
+        }
+    }
+}
+
+function deleteOnClick(el) {
+    var row = $(el).closest('tr');
+    row.remove();
+    //get flight Id
+    var firstID = row.find("td:first")[0].innerText;
+    var urlDelete = "/api/Flights/" + firstID;
+
+    //delete from the server
+    $.ajax({
+        url: urlDelete,
+        method: 'delete'
+    });
+
+    // removing flight details from the table of details
+    clearFlightDetails(firstID);
+
+    // remove the marker
+    var markerToDel = markersMap[firstID];
+    console.log(markerToDel);
+    //markerToDel.closePopup();
+    //markersMap.delete(firstID);
+    map.removeLayer(markerToDel);
+    delete markerToDel;
+}
+
 function showFlightInTables(flight) {
     // show the flights
-    if (flight.is_external == false) {
-        // all external flights
-        $("#tblInternalFlights").append("<tr class=\"tableRow\"><td>" + flight.flight_id + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.is_external + "</td>" + "<td><input type=\"button\" value=\"Delete\"></td></tr>");
+    if (flight.is_external === false) {
+        $("#tblInternalFlights").append(`<tr class=\"tableRow\" id=${flight.flight_id}><td onclick = flightOnClick(this,0)>` + flight.flight_id + "</td>" + "<td onclick = flightOnClick(this,0)>" + flight.company_name + "</td>" +
+            "<td onclick = flightOnClick(this,0)>" + flight.is_external + "</td>" + "<td><button onclick = deleteOnClick(this)>delete</button></td>" + "</tr>");
+    } else {
+        $("#tblExternalFlights").append(`<tr class=\"tableRow\" id=${flight.flight_id}><td onclick = flightOnClick(this,0)>` + flight.flight_id + "</td>" + "<td onclick=flightOnClick(this,0)>" + flight.company_name + "</td>" +
+            "<td onclick=flightOnClick(this,0)>" + flight.is_external);
+    }
+}
+
+function flightOnClick(e, flag) {
+    let id;
+
+    if (flag == 0) {
+        // get the id of the clicked flight
+        var row = $(e).closest('tr');
+        id = row.find("td:first")[0].innerText;
     }
     else {
-        // all internal flights
-        $("#tblExternalFlights").append("<tr class=\"tableRow\"><td>" + flight.flight_id + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.is_external + "</td>" + "</tr > ");
+        id = e;
     }
-}
 
-function deleteFlight() {
-    $('table').on('click', 'input[type="button"]', function () {
-        // get the row of the delete button that pressed
-        var r = (this).closest('tr');
-        // get the id of that row
-        var id = r.cells.item(0).innerHTML;
-        // delete the row
-        r.remove();
+    // draw the path
+    drawLine(id);
 
-        // delete the marker's image
-        //markersMap.get(id).remove();
-        // delete the marker's object from the map
-        //markersMap.delete(id);
+    // show the marker popup
+    var marker = markersMap[id];
+    marker.openPopup();
 
-        // delete from server
-        $.ajax({
-            type: "DELETE",
-            url: "api/Flights/" + id
-        });
-    })
-}
+    // createt thr url
+    var url = "/api/FlightPlan/" + id;
 
-function addRowAndMarkerOnClick(flight, i, marker) {
+    $.ajax({
+        url: url,
+        method: 'GET',
+        success: function (flightPlan) {
 
-
-    // create onclick to each row
-    var table = document.getElementById("tblInternalFlights");
-    var currentRow = table.rows[i];
-    var createClickHandler = function () {
-        return function () {
-            //remove the old details
+            // show the details in the flight details table
             var count = $('#tblDetails tr').length;
             if (count > 1) {
                 document.getElementById("tblDetails").deleteRow(1);
             }
+
+            var finalLat;
+            var finalLon;
+            var endlTime = new Date(flightPlan.initial_location.date_time);
+
+            var initialLat = flightPlan.initial_location.latitude;
+            var initialLon = flightPlan.initial_location.longitude;
+
+            flightPlan.segments.forEach(function (seg) {
+                finalLat = seg.latitude;
+                finalLon = seg.longitude;
+                var addTime = endlTime.getSeconds() + parseFloat(seg.timeSpan_seconds);
+                endlTime.setSeconds(addTime);
+            })
+
             //write the new details
-            $("#tblDetails").append("<tr><td>" + flight.flight_id + "</td>" + "<td>" + flight.longitude + "</td>" + "<td>" + flight.latitude + "</td>" + "<td>" + flight.passengers + "</td>" + "<td>" + flight.company_name + "</td>" + "<td>" + flight.date_time + "</td>" + "<td>" + flight.is_external + "</td></tr>");
-
-            if (this != marker)
-                marker.bindPopup(flight.flight_id).openPopup();
-
-            //check draw line function
-            drawLine(flight.flight_id);
-        };
-    };
-    // adding the onclick method to the row
-    currentRow.onclick = createClickHandler();
-
-    // adding the onclick method to the marker
-    marker.on('click', createClickHandler());
+            $("#tblDetails").append("<tr class=\"detailRow\"><td>" + flightPlan.flight_id + "</td>" + "<td>" + initialLat + "</td>" + "<td>" + initialLon + "</td>" + "<td>" + flightPlan.initial_location.date_time + "</td>" + "<td>" + flightPlan.passengers + "</td>" + "<td>" + flightPlan.company_name + "</td>" + "<td>" + finalLon + "</td>" + "<td>" + finalLat + "</td>" + "<td>" + endlTime + "</td>" + "<td></tr>");
+        }
+    });
 }
 
-function getFlightData() {
-    // assisting variable for adding onclick to each row
-    var i = 1;
-
+function addMarkerToMap(lon, lat, id) {
     //creating the icon
     var iconPlane = createIcon();
 
+    if (markersMap.hasOwnProperty(id)) {
+        markersMap[id].setLatLng([lat, lon]).update();
+    }
+    else {
+        let marker = L.marker([lon, lat], { icon: iconPlane }).addTo(layerGroup);
+        marker.on("click", function () {
+            flightOnClick(id, 1)
+        });
+        markersMap[id] = marker;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //marker.bindPopup(id).openPopup();
+}
+
+function getFlightData() {
     var date = new Date().toISOString().substr(0, 19);
     //var url = "api/Flights?relative_to=" + date + "sync_all";
 
@@ -127,9 +181,7 @@ function getFlightData() {
     var url = "api/Flights?relative_to=";
     var currentDate = "2020-12-27T01:56:21";
 
-    $.getJSON(url + currentDate +"&sync_all", function (data) {
-        //list of markers
-        let markersMap = new Map();
+    $.getJSON(url + currentDate + "&sync_all", function (data) {
 
         // clear the table
         clearTables();
@@ -144,21 +196,7 @@ function getFlightData() {
             var latitude = flight.latitude;
             var flightid = flight.flight_id;
 
-            //fill the map
-            var marker = L.marker([longtitude, latitude], { icon: iconPlane });
-            marker.id = flightid;
-            markersMap.set(flightid, marker);
-
-            // adding the same onclick method to row and marker of each flight
-            addRowAndMarkerOnClick(flight, i, marker);
-            i++;
-
-            // show to flight id in the pop up
-            marker.bindPopup(flightid);
-            marker.addTo(map)
-
-            // delete the flight
-            deleteFlight();
+            addMarkerToMap(longtitude, latitude, flightid);
         });
     });
 }

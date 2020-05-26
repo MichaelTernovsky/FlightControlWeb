@@ -58,7 +58,7 @@ namespace FlightControlWeb
             // creating the lists
             List<Server> serversList = new List<Server>();
             serversList.Add(new Server { ServerID = "111", ServerURL = "https://localhost:44355" });
-            List <Flight> flightsList = new List<Flight>();
+            List<Flight> flightsList = new List<Flight>();
             List<FlightPlan> flightPlansList = new List<FlightPlan>();
 
             // adding the lists to the cache
