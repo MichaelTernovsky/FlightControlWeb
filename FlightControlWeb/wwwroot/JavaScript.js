@@ -5,7 +5,7 @@ function drawLine(id) {
     var marray = [];
     flightPlanUrl = "/api/FlightPlan/"
     $.getJSON(flightPlanUrl + id, function (data) {
-        
+
         data.segments.forEach(function (seg) {
             var longitude = seg.longitude;
             var latitude = seg.latitude;
@@ -20,8 +20,8 @@ function drawLine(id) {
 
     //var layerGroup = L.layerGroup().addTo(map);
     var polyline = L.polyline(marray, { color: 'red' }).addTo(map);
-   // polyline.addTo(layerGroup);
-            }
+    // polyline.addTo(layerGroup);
+}
 
 function createMap() {
     /*create map*/
