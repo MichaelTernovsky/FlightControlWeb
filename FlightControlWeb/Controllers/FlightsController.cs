@@ -26,27 +26,47 @@ namespace FlightControlWeb.Controllers
 
         // GET: api/Flights?relative_to=<DATE_TIME> OR api/Flights?relative_to=<DATE_TIME>&sync_all
         [HttpGet]
-        public async Task<IEnumerable<Flight>> GetAllFlights(DateTime relative_to)
+        public async Task<ActionResult<IEnumerable<Flight>>> GetAllFlights([FromQuery(Name = "relative_to")]  DateTime relativeTo)
         {
             string requestStr = Request.QueryString.Value;
             bool isExternal = requestStr.Contains("sync_all");
 
-            // return the correct list according to the "sync_all"
-            if (isExternal)
+            // convert the time to utc
+            //DateTime convertedTime = TimeZoneInfo.ConvertTimeToUtc(relativeTo);
+            DateTime convertedTime = relativeTo;
+
+            try
             {
-                IEnumerable<Flight> flights = await this.flightsModel.getAllFlights(relative_to);
-                return flights;
+                // return the correct list according to the "sync_all"
+                if (isExternal)
+                {
+                    IEnumerable<Flight> flights = await this.flightsModel.getAllFlights(convertedTime)
+                        ;
+                    return CreatedAtAction(actionName: "GetAllFlights", flights);
+                }
+                else
+                    return CreatedAtAction(actionName: "GetAllFlights", await flightsModel.getAllInternalFlights(convertedTime));
             }
-            else
-                return this.flightsModel.getAllInternalFlights(relative_to);
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public void DeleteFlightPlan(string id)
+        public ActionResult DeleteFlight(string id)
         {
-            this.flightsModel.deleteFlight(id);
-            this.flihtPlansModel.deleteFlightPlan(id);
+            try
+            {
+                this.flightsModel.deleteFlight(id);
+                this.flihtPlansModel.deleteFlightPlan(id);
+                return CreatedAtAction(actionName: "DeleteFlight", "Flight with ID " + id + " deleted");
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }

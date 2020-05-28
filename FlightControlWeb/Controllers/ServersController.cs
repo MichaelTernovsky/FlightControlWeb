@@ -23,31 +23,48 @@ namespace FlightControlWeb.Controllers
 
         // GET: api/Servers
         [HttpGet]
-        public IEnumerable<Server> GetAllExternalServers()
+        public ActionResult<IEnumerable<Server>> GetAllExternalServers()
         {
-            return this.serverManager.getAllExternalServers();
+            return CreatedAtAction(actionName: "GetAllExternalServers", this.serverManager.getAllExternalServers());
+        }
+
+        // POST: api/Servers
+        [HttpPost]
+        public ActionResult AddNewServer(Server newServer)
+        {
+            this.serverManager.addNewServer(newServer);
+            return CreatedAtAction(actionName: "AddNewServer", newServer);
         }
 
         // GET: api/Servers/5
         [HttpGet("{serverID}", Name = "GetServer")]
 
-        public Server GetServer(string serverID)
+        public ActionResult<Server> GetServer(string serverID)
         {
-            return this.serverManager.getServer(serverID);
-        }
-
-        // POST: api/Servers
-        [HttpPost]
-        public void AddNewServer(Server newServer)
-        {
-            this.serverManager.addNewServer(newServer);
+            try
+            {
+                Server s = this.serverManager.getServer(serverID);
+                return CreatedAtAction(actionName: "GetServer", s);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{serverID}")]
-        public void DeleteServer(string serverID)
+        public ActionResult DeleteServer(string serverID)
         {
-            this.serverManager.deleteServer(serverID);
+            try
+            {
+                this.serverManager.deleteServer(serverID);
+                return CreatedAtAction(actionName: "DeleteServer", "Server with ID " + serverID + " deleted");
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }

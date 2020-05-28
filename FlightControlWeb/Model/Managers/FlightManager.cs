@@ -9,6 +9,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FlightControlWeb.Model.Managers
@@ -29,23 +31,48 @@ namespace FlightControlWeb.Model.Managers
             this.flightPlanModel = new FlightPlanManager(this.cache);
         }
 
-        public async Task<FlightPlan> getFlightPlans(List<Flight> flights, string url, HttpClient client)
+        public async Task<IEnumerable<Flight>> getOuterFlights(Server server, DateTime relativeTo)
         {
-            foreach (Flight flight in flights)
-            {
-                // Geting the flight plan from the server.
-                var resp = await client.GetStringAsync(url + "/api/FlightPlan/"
-                    + flight.FlightID.ToString());
-                FlightPlan fp = JsonConvert.DeserializeObject<FlightPlan>(resp);
+            // creating the list of all flights
+            List<Flight> serversFlightsList = new List<Flight>();
 
-                // Insert the flight plan into the outer flight plans dictionary.
-                flightPlanModel.addNewFlightPlan(fp);
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri(server.ServerURL);
+
+            client.DefaultRequestHeaders.Add("User-Agent", "C# console program");
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            List<Flight> outerFlights = null;
+
+            try
+            {
+                var response = await client.GetStringAsync(server.ServerURL + "/api/Flights?relative_to=" + relativeTo.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+                outerFlights = JsonConvert.DeserializeObject<List<Flight>>(response);
+
+                // adding the new flights to our list
+                foreach (Flight flight in outerFlights)
+                {
+                    flight.IsExternal = true;
+                    serversFlightsList.Add(flight);
+
+                    // the dictionary of servers
+                    var flightSource = (Dictionary<string, string>)cache.Get("flightSource");
+
+                    // save the server and the flight
+                    flightSource[flight.FlightID] = server.ServerURL;
+
+                    // insert the list to the cache
+                    cache.Set("flightSource", flightSource);
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Could not get flights from the servers");
             }
 
-            return null;
+            return serversFlightsList;
         }
 
-        public async Task<IEnumerable<Flight>> getAllFlights(DateTime relative_to)
+        public async Task<IEnumerable<Flight>> getAllFlights(DateTime relativeTo)
         {
             // get the server list from the server model
             List<Server> externalServers = (List<Server>)serverModel.getAllExternalServers();
@@ -55,36 +82,15 @@ namespace FlightControlWeb.Model.Managers
             // get the flights list from each server in the servers list
             foreach (Server server in externalServers)
             {
-                HttpClient client = new HttpClient();
-                client.BaseAddress = new Uri(server.ServerURL);
+                // get the flights from the server
+                List<Flight> serverFlights = (List<Flight>)await getOuterFlights(server, relativeTo);
 
-                client.DefaultRequestHeaders.Add("User-Agent", "C# console program");
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                List<Flight> outerFlights = null;
-
-                try
-                {
-                    var response = await client.GetStringAsync(server.ServerURL + "/api/Flights?relative_to=" + relative_to.ToString("yyyy-MM-ddTHH:mm:ss"));
-                    outerFlights = JsonConvert.DeserializeObject<List<Flight>>(response);
-
-                    // adding the new flights to our list
-                    foreach (Flight flight in outerFlights)
-                    {
-                        flight.IsExternal = true;
-                        serversFlightsList.Add(flight);
-                    }
-
-                    // get the corresponded flight plan
-                    await getFlightPlans(outerFlights, server.ServerURL, client);
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("Failed in external flights get reponse");
-                }
+                // adding thos flights to our list
+                serversFlightsList.AddRange(serverFlights);
             }
 
             // get all our internal flights
-            List<Flight> internalFlightsList = (List<Flight>)this.getAllInternalFlights(relative_to);
+            List<Flight> internalFlightsList = (List<Flight>)await getAllInternalFlights(relativeTo);
 
             // adding our internal flight to the list of all flights
             serversFlightsList.AddRange(internalFlightsList);
@@ -92,7 +98,7 @@ namespace FlightControlWeb.Model.Managers
             return serversFlightsList;
         }
 
-        public IEnumerable<Flight> getAllInternalFlights(DateTime relative_to)
+        public async Task<IEnumerable<Flight>> getAllInternalFlights(DateTime relativeTo)
         {
             // get the list from the cache
             var allFlightsList = ((IEnumerable<Flight>)cache.Get("flights")).ToList();
@@ -101,12 +107,12 @@ namespace FlightControlWeb.Model.Managers
 
             foreach (Flight f in allFlightsList)
             {
-                FlightPlan fp = flightPlanModel.getFlightPlan(f.FlightID);
+                FlightPlan fp = await flightPlanModel.getFlightPlan(f.FlightID);
 
                 if (f.IsExternal == false)
                 {
                     // the flight is good for the current time
-                    Flight newFlight = isOccuringAtDateTime(fp, relative_to);
+                    Flight newFlight = isOccuringAtDateTime(fp, f.FlightID, relativeTo);
                     if (newFlight != null)
                         internalFlights.Add(newFlight);
                 }
@@ -115,76 +121,84 @@ namespace FlightControlWeb.Model.Managers
             return internalFlights;
         }
 
-        public Flight isOccuringAtDateTime(FlightPlan fp, DateTime cuurentTime)
+        public Segment getIsegment(FlightPlan fp, int i)
         {
-            DateTime initalTime = fp.InitialLocation.DateTime;
-            Flight newFlight = null;
-            Segment segCurr = null, segPrev = null;
-            bool isGoodSegments = false;
+            Segment indexSeg = null;
+            int index = 0;
 
-            // the flight is already ended
-            if (initalTime > cuurentTime)
-                return null;
-
-            // run over the segments
-            foreach (Segment segment in fp.Segments)
+            foreach (Segment seg in fp.Segments)
             {
-                initalTime = initalTime.AddSeconds(segment.TimeSpanSeconds);
+                if (index == i)
+                    indexSeg = seg;
 
-                if (initalTime >= cuurentTime)
-                {
-                    segPrev = segCurr;
-                    segCurr = segment;
-                    isGoodSegments = true;
-                    break;
-                }
+                index++;
             }
 
-            if (isGoodSegments == false)
-            {
-                Console.WriteLine("Error in the segments array");
+            return indexSeg;
+        }
+        public InitialLocation interpolate(double frac, Segment A, Segment B)
+        {
+            InitialLocation cur = new InitialLocation();
+            double diffXCordinate = B.Latitude - A.Latitude;
+            double diffYCordinate = B.Longitude - A.Longitude;
+            double lat = A.Latitude + diffXCordinate * frac;
+            double lon = A.Longitude + diffYCordinate * frac;
+            cur.Latitude = lat;
+            cur.Longitude = lon;
+            return cur;
+        }
+        public Flight isOccuringAtDateTime(FlightPlan fp, string flightID, DateTime cuurentTime)
+        {
+            DateTime initialCpy = fp.InitialLocation.DateTime;
+            TimeSpan diff = new TimeSpan();
+            Segment A = new Segment();
+            Segment B = new Segment();
+            int i = 0;
+
+            if (initialCpy >= cuurentTime)
                 return null;
+
+            while (initialCpy < cuurentTime)
+            {
+                diff = cuurentTime - initialCpy;
+
+                Segment s = getIsegment(fp, i);
+                if (s != null)
+                    initialCpy = initialCpy.AddSeconds(s.TimeSpanSeconds);
+                else
+                    return null;
+                i++;
             }
 
-            // currTime - inital time of the i segment
-            TimeSpan passedTime = cuurentTime - (initalTime.AddSeconds(-1 * (segCurr.TimeSpanSeconds)));
-            double div = (passedTime.TotalSeconds) / segCurr.TimeSpanSeconds;
+            i--;
 
-            double startLon, startLat, endLon, endLat;
-            // limit case - segment i is the first segment, this the prev is the inital
-            if (segPrev == null)
+            // limit case
+            if (i == 0)
             {
-                startLon = fp.InitialLocation.Longitude;
-                startLat = fp.InitialLocation.Latitude;
-                endLon = segCurr.Longitude;
-                endLat = segCurr.Latitude;
+                A.Latitude = fp.InitialLocation.Latitude;
+                A.Longitude = fp.InitialLocation.Longitude;
             }
             else
-            {
-                startLon = segPrev.Longitude;
-                startLat = segPrev.Latitude;
-                endLon = segCurr.Longitude;
-                endLat = segCurr.Latitude;
-            }
+                A = getIsegment(fp, i - 1);
 
-            double pathLength = Math.Sqrt(Math.Pow((endLat - startLat), 2) + Math.Pow((endLon - startLon), 2));
-            double newLon = fp.InitialLocation.Longitude + pathLength;
-            double newLat = fp.InitialLocation.Latitude + pathLength;
+            B = getIsegment(fp, i);
+            double frac = diff.TotalSeconds / B.TimeSpanSeconds;
+            InitialLocation currLoc = interpolate(frac, A, B);
 
             // creating the new flight
-            newFlight = createFlightByFlightPlan(fp);
-            newFlight.Longitude = newLon;
-            newFlight.Latitude = newLat;
+            Flight newFlight = createFlightByFlightPlan(fp, flightID);
+            newFlight.Longitude = currLoc.Longitude;
+            newFlight.Latitude = currLoc.Latitude;
 
             return newFlight;
         }
-        public Flight createFlightByFlightPlan(FlightPlan fp)
+        public Flight createFlightByFlightPlan(FlightPlan fp, string flightID)
         {
-            Flight newFlight = new Flight { FlightID = fp.FlightID, Longitude = fp.InitialLocation.Latitude, Latitude = fp.InitialLocation.Longitude, Passengers = fp.Passengers, CompanyName = fp.CompanyName, DateTime = fp.InitialLocation.DateTime, IsExternal = false };
+            // create the corresponded flight
+            Flight newFlight = new Flight { FlightID = flightID, Longitude = fp.InitialLocation.Latitude, Latitude = fp.InitialLocation.Longitude, Passengers = fp.Passengers, CompanyName = fp.CompanyName, DateTime = fp.InitialLocation.DateTime, IsExternal = false };
 
             return newFlight;
         }
-
         public void addNewFlight(Flight newFlight)
         {
             // get the list from the cache
@@ -203,10 +217,19 @@ namespace FlightControlWeb.Model.Managers
 
             Flight f = allFlightsList.Where(x => String.Equals(x.FlightID, flight_id)).FirstOrDefault();
             if (f != null)
+            {
                 allFlightsList.Remove(f);
 
-            // insert the list to the cache
-            cache.Set("flights", allFlightsList);
+                // insert the list to the cache
+                cache.Set("flights", allFlightsList);
+            }
+            else
+            {
+                // insert the list to the cache
+                cache.Set("flights", allFlightsList);
+
+                throw new Exception("Flight was not found");
+            }
         }
     }
 }

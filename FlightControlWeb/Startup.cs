@@ -58,13 +58,20 @@ namespace FlightControlWeb
             // creating the lists
             List<Server> serversList = new List<Server>();
             serversList.Add(new Server { ServerID = "111", ServerURL = "https://localhost:44355" });
+            serversList.Add(new Server { ServerID = "222", ServerURL = "http://rony1.atwebpages.com" });
+            //serversList.Add(new Server { ServerID = "333", ServerURL = "http://rony2.atwebpages.com" });
+            //serversList.Add(new Server { ServerID = "444", ServerURL = "http://rony3.atwebpages.com" });
+            //serversList.Add(new Server { ServerID = "555", ServerURL = "http://rony5.atwebpages.com" });
+            //serversList.Add(new Server { ServerID = "666", ServerURL = "http://rony6.atwebpages.com" });
             List<Flight> flightsList = new List<Flight>();
-            List<FlightPlan> flightPlansList = new List<FlightPlan>();
+            Dictionary<string, FlightPlan> flightsDict = new Dictionary<string, FlightPlan>();
+            Dictionary<string, string> flightSource = new Dictionary<string, string>();
 
             // adding the lists to the cache
             cache.Set("servers", serversList);
             cache.Set("flights", flightsList);
-            cache.Set("flightPlans", flightPlansList);
+            cache.Set("flightsDict", flightsDict);
+            cache.Set("flightSource", flightSource);
         }
     }
 }

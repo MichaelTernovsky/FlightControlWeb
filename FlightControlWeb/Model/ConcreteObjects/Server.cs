@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 
 namespace FlightControlWeb.Model.ConcreteObjects
 {
@@ -11,7 +12,9 @@ namespace FlightControlWeb.Model.ConcreteObjects
      */
     public class Server
     {
+        [Required]
         public string ServerID { get; set; }
+        [Required]
         public string ServerURL { get; set; }
     }
 }

@@ -13,12 +13,14 @@ namespace FlightControlWeb.Model.Interfaces
      */
     public interface IFlightManager
     {
-        IEnumerable<Flight> getAllInternalFlights(DateTime relative_to);
-        Task<IEnumerable<Flight>> getAllFlights(DateTime relative_to);
+        Task<IEnumerable<Flight>> getAllInternalFlights(DateTime relativeTo);
+        Task<IEnumerable<Flight>> getAllFlights(DateTime relativeTo);
+        Task<IEnumerable<Flight>> getOuterFlights(Server server, DateTime relativeTo);
         void addNewFlight(Flight newFlight);
         void deleteFlight(string flight_id);
-        Flight createFlightByFlightPlan(FlightPlan fp);
-        Flight isOccuringAtDateTime(FlightPlan fp, DateTime cuurentTime);
-        Task<FlightPlan> getFlightPlans(List<Flight> flights, string url, HttpClient client);
+        Flight createFlightByFlightPlan(FlightPlan fp, string flightID);
+        Flight isOccuringAtDateTime(FlightPlan fp, string flightID, DateTime cuurentTime);
+        Segment getIsegment(FlightPlan fp, int i);
+        InitialLocation interpolate(double frac, Segment A, Segment B);
     }
 }

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using FlightControlWeb.Model.ConcreteObjects;
 using FlightControlWeb.Model.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
 
 namespace FlightControlWeb.Model.Managers
 {
@@ -13,52 +16,102 @@ namespace FlightControlWeb.Model.Managers
     public class FlightPlanManager : IFlightPlanManager
     {
         private IMemoryCache cache;
+        private IServerManager serverManager;
+
         public FlightPlanManager(IMemoryCache cache)
         {
             this.cache = cache;
+            this.serverManager = new ServerManager(this.cache);
         }
 
-        public void addNewFlightPlan(FlightPlan newFlightPlan)
+        public void addNewFlightPlan(FlightPlan newFlightPlan, string flightID)
         {
             // get the list from the cache
-            var allFlightPlansList = ((IEnumerable<FlightPlan>)cache.Get("flightPlans")).ToList();
+            var flightsDict = (Dictionary<string, FlightPlan>)cache.Get("flightsDict");
 
-            // get the flight by id and check if exists
-            FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.FlightID, newFlightPlan.FlightID)).FirstOrDefault();
-
-            if (fp == null)
-                allFlightPlansList.Add(newFlightPlan);
+            flightsDict[flightID] = newFlightPlan;
 
             // insert the list to the cache
-            cache.Set("flightPlans", allFlightPlansList);
+            cache.Set("flightsDict", flightsDict);
         }
-
         public void deleteFlightPlan(string flight_id)
         {
             // get the list from the cache
-            var allFlightPlansList = ((IEnumerable<FlightPlan>)cache.Get("flightPlans")).ToList();
+            var flightsDict = (Dictionary<string, FlightPlan>)cache.Get("flightsDict");
 
-            FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.FlightID, flight_id)).FirstOrDefault();
-            if (fp != null)
-                allFlightPlansList.Remove(fp);
+            // check if the flight id exists
+            bool isExist = flightsDict.ContainsKey(flight_id);
 
             // insert the list to the cache
-            cache.Set("flightPlans", allFlightPlansList);
+            cache.Set("flightsDict", flightsDict);
+
+            // delete the flight
+            if (isExist)
+                flightsDict.Remove(flight_id);
+            else
+                throw new Exception("Flight not found");
         }
-
-        public FlightPlan getFlightPlan(string flight_id)
+        public async Task<FlightPlan> sendingRequest(HttpClient client, string serverURL, string id)
         {
-            // get the list from the cache
-            var allFlightPlansList = ((IEnumerable<FlightPlan>)cache.Get("flightPlans")).ToList();
-
-            FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.FlightID, flight_id)).FirstOrDefault();
-
-            // insert the list to the cache
-            cache.Set("flightPlans", allFlightPlansList);
+            FlightPlan fp = null;
+            try
+            {
+                // Geting the flight plan from the server.
+                var resp = await client.GetStringAsync(serverURL + "/api/FlightPlan/" + id.ToString());
+                fp = JsonConvert.DeserializeObject<FlightPlan>(resp);
+            }
+            catch
+            {
+                throw new Exception("Could not get the data from the server");
+            }
 
             return fp;
         }
 
+        public async Task<FlightPlan> getFlightPlan(string flight_id)
+        {
+            // get the list from the cache
+            var flightsDict = (Dictionary<string, FlightPlan>)cache.Get("flightsDict");
+
+            // the dictionary of servers
+            var flightSource = (Dictionary<string, string>)cache.Get("flightSource");
+
+            FlightPlan fp = null;
+
+            // if it is internal flight plan
+            if (flightsDict.ContainsKey(flight_id))
+            {
+                fp = flightsDict[flight_id];
+            }
+            else
+            {
+                if (flightSource.ContainsKey(flight_id))
+                {
+                    string serverURL = flightSource[flight_id];
+
+                    HttpClient client = new HttpClient();
+                    client.BaseAddress = new Uri(serverURL);
+
+                    client.DefaultRequestHeaders.Add("User-Agent", "C# console program");
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    // send request to get the flight plan
+                    fp = await sendingRequest(client, serverURL, flight_id);
+                }
+                else
+                {
+                    throw new Exception("Flight not found");
+                }
+            }
+
+            // insert the list to the cache
+            cache.Set("flightSource", flightSource);
+
+            // insert the list to the cache
+            cache.Set("flightsDict", flightsDict);
+
+            return fp;
+        }
         public string generateFlight_Id(string companyName)
         {
             bool isGoodKey = true;
@@ -87,17 +140,16 @@ namespace FlightControlWeb.Model.Managers
         public int isIdExist(string flight_id)
         {
             // get the list from the cache
-            var allFlightPlansList = ((IEnumerable<FlightPlan>)cache.Get("flightPlans")).ToList();
-
-            FlightPlan fp = allFlightPlansList.Where(x => String.Equals(x.FlightID, flight_id)).FirstOrDefault();
+            var flightsDict = (Dictionary<string, FlightPlan>)cache.Get("flightsDict");
 
             // insert the list to the cache
-            cache.Set("flightPlans", allFlightPlansList);
+            cache.Set("flightsDict", flightsDict);
 
-            if (fp == null)
-                return 0;
-            else
+            // delete the flight
+            if (flightsDict.ContainsKey(flight_id))
                 return 1;
+            else
+                return 0;
         }
     }
 }

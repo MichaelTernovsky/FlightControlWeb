@@ -83,7 +83,6 @@ function deleteOnClick(el) {
 
     // remove the marker
     var markerToDel = markersMap[firstID];
-    console.log(markerToDel);
     //markerToDel.closePopup();
     //markersMap.delete(firstID);
     map.removeLayer(markerToDel);
@@ -128,6 +127,8 @@ function flightOnClick(e, flag) {
         method: 'GET',
         success: function (flightPlan) {
 
+            console.log(flightPlan);
+
             // show the details in the flight details table
             var count = $('#tblDetails tr').length;
             if (count > 1) {
@@ -149,7 +150,7 @@ function flightOnClick(e, flag) {
             })
 
             //write the new details
-            $("#tblDetails").append("<tr class=\"detailRow\"><td>" + flightPlan.flight_id + "</td>" + "<td>" + initialLon + "</td>" + "<td>" + initialLat + "</td>" + "<td>" + flightPlan.initial_location.date_time + "</td>" + "<td>" + flightPlan.passengers + "</td>" + "<td>" + flightPlan.company_name + "</td>" + "<td>" + finalLon + "</td>" + "<td>" + finalLat + "</td>" + "<td>" + endlTime + "</td>" + "<td></tr>");
+            $("#tblDetails").append("<tr class=\"detailRow\"><td>" + id + "</td>" + "<td>" + initialLon + "</td>" + "<td>" + initialLat + "</td>" + "<td>" + flightPlan.initial_location.date_time + "</td>" + "<td>" + flightPlan.passengers + "</td>" + "<td>" + flightPlan.company_name + "</td>" + "<td>" + finalLon + "</td>" + "<td>" + finalLat + "</td>" + "<td>" + endlTime + "</td>" + "<td></tr>");
         }
     });
 }
@@ -178,8 +179,8 @@ function getFlightData() {
     //var url = "api/Flights?relative_to=" + date + "sync_all";
 
     //use the data from the server to fill the tables and mark the map 
-    var url = "api/Flights?relative_to=";
-    var currentDate = "2020-12-27T01:56:21";
+    var url = "/api/Flights?relative_to=";
+    var currentDate = "2020-12-27T01:56:21Z";
 
     $.getJSON(url + currentDate + "&sync_all", function (data) {
 

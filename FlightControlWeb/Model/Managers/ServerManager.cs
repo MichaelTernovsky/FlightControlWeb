@@ -30,19 +30,6 @@ namespace FlightControlWeb.Model.Managers
             cache.Set("servers", serversList);
         }
 
-        public void deleteServer(string serverID)
-        {
-            // get the list from the cache
-            var serversList = ((IEnumerable<Server>)cache.Get("servers")).ToList();
-
-            Server s = serversList.Where(x => String.Equals(x.ServerID, serverID)).FirstOrDefault();
-            if (s != null)
-                serversList.Remove(s);
-
-            // insert the list to the cache
-            cache.Set("servers", serversList);
-        }
-
         public IEnumerable<Server> getAllExternalServers()
         {
             // get the list from the cache
@@ -51,13 +38,32 @@ namespace FlightControlWeb.Model.Managers
             return serversList;
         }
 
+        public void deleteServer(string serverID)
+        {
+            // get the list from the cache
+            var serversList = ((IEnumerable<Server>)cache.Get("servers")).ToList();
+
+            Server getServer = serversList.Where(x => String.Equals(x.ServerID, serverID)).FirstOrDefault();
+
+            // insert the list to the cache
+            cache.Set("servers", serversList);
+
+            if (getServer != null)
+                serversList.Remove(getServer);
+            else
+                throw new Exception("Server does not exist");
+        }
+
         public Server getServer(string serverID)
         {
             // get the list from the cache
             var serversList = ((IEnumerable<Server>)cache.Get("servers")).ToList();
-            Server s = serversList.Where(x => String.Equals(x.ServerID, serverID)).FirstOrDefault();
+            Server getServer = serversList.Where(x => String.Equals(x.ServerID, serverID)).FirstOrDefault();
 
-            return s;
+            if (getServer == null)
+                throw new Exception("Server does not exist");
+            else
+                return getServer;
         }
     }
 }
