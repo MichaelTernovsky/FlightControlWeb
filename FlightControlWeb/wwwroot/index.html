@@ -24,18 +24,20 @@
         </div>
 
         <div id="info" class="component info">
-            <h3 class="flight_details_header">Flight Details</h3>
+            <h4 class="flight_details_header">Flight Details</h4>
             <div class="row text-center">
                 <table class="table selected_details_table" id="tblDetails">
                     <thead>
                         <tr>
-                            <th>Flight ID</th>
-                            <th>Longitude</th>
-                            <th>Latitude</th>
-                            <th>Passengers</th>
-                            <th>Company Name</th>
-                            <th>Date Time</th>
-                            <th>Is External</th>
+                            <th style="font-size: smaller">Flight ID</th>
+                            <th style="font-size:smaller">Inital Longitude</th>
+                            <th style="font-size:smaller">Inital Latitude</th>
+                            <th style="font-size:smaller">Inital Time</th>
+                            <th style="font-size:smaller">Passengers</th>
+                            <th style="font-size:smaller">Company Name</th>
+                            <th style="font-size:smaller">Final Longitude</th>
+                            <th style="font-size:smaller">Final Latitude</th>
+                            <th style="font-size:smaller">End Time</th>
                             <th> </th>
                         </tr>
                     </thead>
@@ -94,7 +96,6 @@
     </div>
 
     <script>createMap();</script>
-    <script>deleteFlight();</script>
     <script>setInterval(getFlightData, 3000);</script>
 
     <!--drug and drop Script-->

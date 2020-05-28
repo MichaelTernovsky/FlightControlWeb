@@ -28,14 +28,29 @@ namespace FlightControlWeb.Model.Managers
             this.serverModel = new ServerManager(this.cache);
             this.flightPlanModel = new FlightPlanManager(this.cache);
         }
+
+        public async Task<FlightPlan> getFlightPlans(List<Flight> flights, string url, HttpClient client)
+        {
+            foreach (Flight flight in flights)
+            {
+                // Geting the flight plan from the server.
+                var resp = await client.GetStringAsync(url + "/api/FlightPlan/"
+                    + flight.FlightID.ToString());
+                FlightPlan fp = JsonConvert.DeserializeObject<FlightPlan>(resp);
+
+                // Insert the flight plan into the outer flight plans dictionary.
+                flightPlanModel.addNewFlightPlan(fp);
+            }
+
+            return null;
+        }
+
         public async Task<IEnumerable<Flight>> getAllFlights(DateTime relative_to)
         {
             // get the server list from the server model
             List<Server> externalServers = (List<Server>)serverModel.getAllExternalServers();
             // creating the list of all flights
             List<Flight> serversFlightsList = new List<Flight>();
-            // get all our internal flights
-            List<Flight> internalFlightsList = (List<Flight>)this.getAllInternalFlights(relative_to);
 
             // get the flights list from each server in the servers list
             foreach (Server server in externalServers)
@@ -58,12 +73,18 @@ namespace FlightControlWeb.Model.Managers
                         flight.IsExternal = true;
                         serversFlightsList.Add(flight);
                     }
+
+                    // get the corresponded flight plan
+                    await getFlightPlans(outerFlights, server.ServerURL, client);
                 }
                 catch (Exception)
                 {
                     Console.WriteLine("Failed in external flights get reponse");
                 }
             }
+
+            // get all our internal flights
+            List<Flight> internalFlightsList = (List<Flight>)this.getAllInternalFlights(relative_to);
 
             // adding our internal flight to the list of all flights
             serversFlightsList.AddRange(internalFlightsList);

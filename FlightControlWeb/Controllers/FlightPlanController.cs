@@ -12,13 +12,13 @@ namespace FlightControlWeb.Controllers
     public class FlightPlanController : ControllerBase
     {
         private IMemoryCache cache;
-        private IFlightPlanManager flihtPlansModel;
+        private IFlightPlanManager flightPlansModel;
         private IFlightManager flightsModel;
 
         public FlightPlanController(IMemoryCache cache)
         {
             this.cache = cache;
-            flihtPlansModel = new FlightPlanManager(this.cache);
+            flightPlansModel = new FlightPlanManager(this.cache);
             flightsModel = new FlightManager(this.cache);
         }
 
@@ -26,14 +26,14 @@ namespace FlightControlWeb.Controllers
         [HttpGet("{id}", Name = "GetFlightPlan")]
         public FlightPlan GetFlightPlan(string id)
         {
-            return this.flihtPlansModel.getFlightPlan(id);
+            return this.flightPlansModel.getFlightPlan(id);
         }
 
         // POST: api/FlightPlan
         [HttpPost]
         public void AddNewFlightPlan(FlightPlan newFlightPlan)
         {
-            string flight_id = this.flihtPlansModel.generateFlight_Id(newFlightPlan.CompanyName);
+            string flight_id = this.flightPlansModel.generateFlight_Id(newFlightPlan.CompanyName);
 
             // adding the id also for the fligh plan
             newFlightPlan.FlightID = flight_id;
@@ -46,7 +46,7 @@ namespace FlightControlWeb.Controllers
             this.flightsModel.addNewFlight(newFlight);
 
             // adding the flight plan
-            this.flihtPlansModel.addNewFlightPlan(newFlightPlan);
+            this.flightPlansModel.addNewFlightPlan(newFlightPlan);
         }
     }
 }
