@@ -1,38 +1,45 @@
 ﻿let map;
 var layerGroup;
 var markersMap = new Object();
+var polyid = null;
 
-function drawLine(id) {
+function ParseDataToLine(data,id) {
+    //parse the data to segments array and draw it
     var marray = [];
+    let arr = data.segments;
+    for (let i = 0; i < arr.length; i++) {
+        marray.push([data.segments[i]["latitude"], data.segments[i]["longitude"]]);
+    };
+    //layerGroup is create to able to dealte the polyline later.
+    removePolyLine();
+    var polyline = L.polyline(marray, { color: 'red' }).addTo(map);
+    polyline.addTo(layerGroup);
+    polyid = id;
+}
+function drawLine(id) {
+    //use getJson to get a FlightPlan by id and then parse it to data and draw the line on the map.
     flightPlanUrl = "/api/FlightPlan/"
     $.getJSON(flightPlanUrl + id, function (data) {
-
-        let arr = data.segments;
-        for (let i = 0; i < arr.length; i++) {
-            marray.push(data.segments[i]["latitude"], data.segments[i]["longitude"]);
-        }
-
-        //.forEach(function (seg) {
-        //console.log(seg["latitude"], seg["longitude"]);
-        //})
+        ParseDataToLine(data,id);
     });
-    // marray.push([20, 30.2]);
-    // marray.push([100, 350]);
-    console.log(marray);
-
-    //var layerGroup = L.layerGroup().addTo(map);
-    var polyline = L.polyline(marray, { color: 'red' }).addTo(map);
-    // polyline.addTo(layerGroup);
 }
 
 function createMap() {
-    /*create map*/
+    //create map
     map = L.map('map').setView([34.873331, 32.006333], 1.5);
     L.tileLayer('https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=z9JRmQouqskUAwB0autN', {
         attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
     }).addTo(map);
 
     layerGroup = L.layerGroup().addTo(map);
+
+    map.on('click', function (e) {
+        //click on the map event
+        //delete the polyline from the map.
+        if (polyid != null) {
+            removePolyLine();
+        };
+    })
 }
 
 function createIcon() {
@@ -66,6 +73,7 @@ function clearFlightDetails(flightID) {
 }
 
 function deleteOnClick(el) {
+    //delete flight from evreywhere
     var row = $(el).closest('tr');
     row.remove();
     //get flight Id
@@ -86,7 +94,15 @@ function deleteOnClick(el) {
     //markerToDel.closePopup();
     //markersMap.delete(firstID);
     map.removeLayer(markerToDel);
+    if (polyid == firstID) {
+        removePolyLine();
+    }
     delete markerToDel;
+}
+
+function removePolyLine() {
+    layerGroup.clearLayers();
+    polyid = null;
 }
 
 function showFlightInTables(flight) {
@@ -102,7 +118,7 @@ function showFlightInTables(flight) {
 
 function flightOnClick(e, flag) {
     let id;
-
+        
     if (flag == 0) {
         // get the id of the clicked flight
         var row = $(e).closest('tr');
@@ -163,7 +179,7 @@ function addMarkerToMap(lon, lat, id) {
         markersMap[id].setLatLng([lat, lon]).update();
     }
     else {
-        let marker = L.marker([lon, lat], { icon: iconPlane }).addTo(layerGroup);
+        let marker = L.marker([lon, lat], { icon: iconPlane }).addTo(map);
         marker.on("click", function () {
             flightOnClick(id, 1)
         });
