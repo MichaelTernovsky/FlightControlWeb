@@ -1,5 +1,6 @@
 ﻿let map;
 var layerGroup;
+var planeLayerGroup;
 var markersMap = new Object();
 var polyid = null;
 
@@ -7,11 +8,14 @@ function ParseDataToLine(data,id) {
     //parse the data to segments array and draw it
     var marray = [];
     let arr = data.segments;
+    marray.push([data.initial_location["latitude"], data.initial_location["longitude"]]);
     for (let i = 0; i < arr.length; i++) {
         marray.push([data.segments[i]["latitude"], data.segments[i]["longitude"]]);
     };
     //layerGroup is create to able to dealte the polyline later.
     removePolyLine();
+    addHomeMarker(data.initial_location["latitude"], data.initial_location["longitude"]);
+    addDestMarker(data.segments[arr.length - 1]["latitude"], data.segments[arr.length - 1]["longitude"]);
     var polyline = L.polyline(marray, { color: 'red' }).addTo(map);
     polyline.addTo(layerGroup);
     polyid = id;
@@ -32,6 +36,8 @@ function createMap() {
     }).addTo(map);
 
     layerGroup = L.layerGroup().addTo(map);
+    planeLayerGroup = L.layerGroup().addTo(map);
+
 
     map.on('click', function (e) {
         //click on the map event
@@ -52,6 +58,28 @@ function createIcon() {
     })
 
     return iconPlane;
+}
+
+function createHomeIcon() {
+    //icon
+    var iconHome = L.icon({
+        iconUrl: 'https://img.icons8.com/color/48/000000/order-delivered.png',
+        iconSize: [48, 40],
+        popupAnchor: [0, 0]
+    })
+
+    return iconHome;
+}
+
+function createDestIcon() {
+    //icon
+    var iconHome = L.icon({
+        iconUrl: 'https://img.icons8.com/color/48/000000/filled-flag2.png',
+        iconSize: [48, 40],
+        popupAnchor: [0, 0]
+    })
+
+    return iconHome;
 }
 
 function clearTables() {
@@ -167,38 +195,51 @@ function flightOnClick(e, flag) {
 
             //write the new details
             $("#tblDetails").append("<tr class=\"detailRow\"><td>" + id + "</td>" + "<td>" + initialLon + "</td>" + "<td>" + initialLat + "</td>" + "<td>" + flightPlan.initial_location.date_time + "</td>" + "<td>" + flightPlan.passengers + "</td>" + "<td>" + flightPlan.company_name + "</td>" + "<td>" + finalLon + "</td>" + "<td>" + finalLat + "</td>" + "<td>" + endlTime + "</td>" + "<td></tr>");
+        },
+        error: function (jqXHR, textSatus, errorThrown) {
+            alert(textStatus + ":" + jqXHR.status + " " + errorThrown)
         }
     });
 }
 
-function addMarkerToMap(lon, lat, id) {
+function addMarkerToMap(lat, lon, id) {
     //creating the icon
     var iconPlane = createIcon();
 
-    if (markersMap.hasOwnProperty(id)) {
-        markersMap[id].setLatLng([lat, lon]).update();
-    }
-    else {
-        let marker = L.marker([lon, lat], { icon: iconPlane }).addTo(map);
+        let marker = L.marker([lat, lon], { icon: iconPlane }).addTo(map);
+        marker.addTo(planeLayerGroup);
         marker.on("click", function () {
             flightOnClick(id, 1)
         });
         markersMap[id] = marker;
-    }
+  //  }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //marker.bindPopup(id).openPopup();
 }
 
-function getFlightData() {
-    var date = new Date().toISOString().substr(0, 19);
-    //var url = "api/Flights?relative_to=" + date + "sync_all";
+function addHomeMarker(lat, lon) {
+    let iconHome = createHomeIcon();
+    let marker = L.marker([lat, lon], { icon: iconHome }).addTo(map);
+    marker.addTo(layerGroup);
+}
 
+function addDestMarker(lat, lon) {
+    let iconDest = createDestIcon();
+    let marker = L.marker([lat, lon], { icon: iconDest }).addTo(map);
+    marker.addTo(layerGroup);
+}
+
+function getFlightData() {
+
+    var date = new Date().toISOString().substr(0, 19);
     //use the data from the server to fill the tables and mark the map 
     var url = "/api/Flights?relative_to=";
-    var currentDate = "2020-12-27T01:56:21Z";
+    var currentDate = date;
 
     $.getJSON(url + currentDate + "&sync_all", function (data) {
+        //clear all the planes markers from the map
+        planeLayerGroup.clearLayers();
 
         // clear the table
         clearTables();
@@ -213,7 +254,8 @@ function getFlightData() {
             var latitude = flight.latitude;
             var flightid = flight.flight_id;
 
-            addMarkerToMap(longtitude, latitude, flightid);
+
+            addMarkerToMap(latitude, longtitude,  flightid);
         });
     });
 }
