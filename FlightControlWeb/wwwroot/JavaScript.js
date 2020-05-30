@@ -203,16 +203,44 @@ function flightOnClick(e, flag) {
     });
 }
 
-function addMarkerToMap(lat, lon, id) {
+function addMarkerToMap(lat, lon, id, angle) {
     //creating the icon
     var iconPlane = createIcon();
-    let marker = L.marker([lat, lon], { icon: iconPlane, rotationAngle: Math.atan2(0, 0) }).addTo(map);
+    let marker = L.marker([lat, lon], { icon: iconPlane, rotationAngle: angle }).addTo(map);
     marker.addTo(planeLayerGroup);
     marker.bindPopup(id);
         marker.on("click", function () {
             flightOnClick(id, 1);
         });
     markersMap[id] = marker;
+}
+
+function ifOnLine(linep1x, linep1y, linep2x, linep2y, px, py) {
+            //check if point is between 2 point(on line).
+    var distance = function (p1x, p1y, p2x, p2y) {
+        return Math.sqrt(Math.pow(p1x - p2x, 2) + Math.pow(p1y - p2y, 2));
+    };
+    var dist_sum = Math.round(distance(linep1x, linep1y, px, py) + distance(linep2x, linep2y, px, py));
+    return true ? dist_sum == Math.round(distance(linep1x, linep1y, linep2x, linep2y)) : false;
+}
+
+function calcAngle(lat,lon,segArr) {
+//calc the current angle of the plane
+    current_lat = lat;
+    current_lon = lon;
+
+    var str = "BLA";
+    for (var i = 0; i < segArr.length - 1; i++) {
+       
+        //check of evrey seg if its the current seg
+        if (ifOnLine(segArr[i][0], segArr[i][1], segArr[i + 1][0], segArr[i + 1][1], current_lat, current_lon) == true) {
+            str = "BLO";
+            break;
+        }
+    }
+    //calc the angle in degrees
+    var angleDeg = -1 * Math.atan2(segArr[i + 1][0] - segArr[i][0], segArr[i + 1][1] - segArr[i][1]) * 180 / Math.PI; 
+    return angleDeg;
 }
 
 function addHomeMarker(lat, lon) {
@@ -227,6 +255,36 @@ function addDestMarker(lat, lon) {
     marker.addTo(layerGroup);
 }
 
+function getAngleBySegArr(latitude,longtitude,flightId) {
+
+    var url = "/api/FlightPlan/" + flightId;
+    var answer =[];
+    $.ajax({
+        url: url,
+        method: 'GET',
+        async: false,
+        success: function (flightPlan) {
+
+            var initialLat = flightPlan.initial_location.latitude;
+            var initialLon = flightPlan.initial_location.longitude;
+            init = [initialLat, initialLon];
+            answer.push(init);
+            //get all the segments include the initialLocation
+            flightPlan.segments.forEach(function (seg) {
+                var segLat = seg.latitude;
+                var segLon = seg.longitude;
+                seg = [segLat, segLon];
+                answer.push(seg);
+            });
+        },
+        error: function (jqXHR, textSatus, errorThrown) {
+            alert(textStatus + ":" + jqXHR.status + " " + errorThrown)
+        }
+    });
+    angle = calcAngle(latitude, longtitude, answer);
+    return angle;
+}
+
 function getFlightData() {
 
     var date = new Date().toISOString().substr(0, 19);
@@ -237,7 +295,6 @@ function getFlightData() {
     $.getJSON(url + currentDate + "&sync_all", function (data) {
         //clear all the planes markers from the map
         planeLayerGroup.clearLayers();
-
         // clear the table
         clearTables();
         // show the flights in the tables
@@ -250,9 +307,8 @@ function getFlightData() {
             var longtitude = flight.longitude;
             var latitude = flight.latitude;
             var flightid = flight.flight_id;
-
-
-            addMarkerToMap(latitude, longtitude,  flightid);
+            var angle = getAngleBySegArr(latitude,longtitude,flight.flight_id);
+            addMarkerToMap(latitude, longtitude, flightid, angle);
         });
     });
 }
