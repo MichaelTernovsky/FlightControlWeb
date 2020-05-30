@@ -59,6 +59,8 @@ namespace FlightControlWeb.Model.Managers
             // get the list from the cache
             var serversList = ((IEnumerable<Server>)cache.Get("servers")).ToList();
             Server getServer = serversList.Where(x => String.Equals(x.ServerID, serverID)).FirstOrDefault();
+            // insert the list to the cache
+            cache.Set("servers", serversList);
 
             if (getServer == null)
                 throw new Exception("Server does not exist");

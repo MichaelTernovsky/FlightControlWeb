@@ -198,7 +198,7 @@ function getFlightData() {
     var url = "/api/Flights?relative_to=";
     var currentDate = "2020-12-27T01:56:21Z";
 
-    $.getJSON(url + currentDate + "&sync_all", function (data) {
+    $.getJSON(url + date + "&sync_all", function (data) {
 
         // clear the table
         clearTables();
