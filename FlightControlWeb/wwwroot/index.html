@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="leaflet.rotatedMarker.js"></script>
 
     <script src="JavaScript.js"></script>
     <title>Web Flight Control</title>
@@ -60,23 +61,21 @@
                     </thead>
                 </table>
             </div>
-
             <br /><br /><br /><br />
-
-            <div class="row dropBox">
+            <!--drug and drop Script-->
+            <div class="drop">
                 <!--TEST DRUG AND DROP!-->
-                <div id="drop-area">
-                    <form class="my-form">
-                        <progress id="progress-bar" max=100 value=0></progress>
+                    <form class="my-form" id="choina">
                         <div id="gallery"></div>
                         <!--<p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>-->
-                        <input type="file" id="fileElem" multiple accept="JSON/*" onchange="ondrop(this.files)">
+                        <input type="file" id="fileElem" multiple accept="JSON/*">
                         <!--onchange="handleFiles(this.files)"-->
                         <label class="button" for="fileElem">Select some files</label>
-                        <img src="drop-files-here-extra.jpg" />
                     </form>
-                </div>
             </div>
+            <script>
+                var dropArea = new jsondrop('list_in', 'fileElem');
+            </script>
 
         </div>
 
@@ -101,168 +100,6 @@
     <script>createMap();</script>
     <script>setInterval(getFlightData, 3000);</script>
 
-    <!--drug and drop Script-->
-
-    <script>
-        var jsondrop = function (elem, options) {
-            this.element = document.getElementById(elem);
-            this.options = options || {};
-            this.name = 'jsondrop';
-            this.files = [];
-            this._addEventHandlers();
-        }
-        jsondrop.prototype._readFiles = function (files) {
-            var _this = this;
-            for (i = 0; i < files.length; i++) {
-                (function (file) {
-                    var fr = new FileReader();
-                    fr.readAsText(file, 'UTF-8');
-                    fr.onload = function () {
-                        var json = JSON.parse(fr.result);
-                        $.ajax({
-                            type: "POST",
-                            url: "api/FlightPlan",
-                            data: JSON.stringify(json),
-                            contentType: "application/json",
-                            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                                console.log(textStatus);
-                                alert("Request: " + XMLHttpRequest + "\n\nStatus: " + textStatus + "\n\nError: " + errorThrown);
-                            }
-
-                        });
-                    };
-                })(files[i]);
-            }
-        }
-
-
-        jsondrop.prototype._addEventHandlers = function () {
-
-            // bind jsondrop to _this for use in 'ondrop'
-            var _this = this;
-
-            this.element.addEventListener('dragover', ondragover, false);
-            this.element.addEventListener('dragleave', ondragleave, false);
-            this.element.addEventListener('drop', ondrop, false);
-
-            function ondragover(e) {
-                $("#list_out").hide();
-                $("#dropimg").show();
-
-                e = e || event;
-                e.preventDefault();
-                this.className = 'dragging';
-            }
-
-            function ondragleave(e) {   //not working
-                e = e || event;
-                e.preventDefault();
-                this.className = 'drop-area';
-                $("#dropimg").show();
-                $("#list_out").show();
-            }
-
-            function ondrop(e) {
-                e = e || event;
-                e.preventDefault();
-                this.className = 'drop-area';
-                files = e.dataTransfer.files;
-                _this._readFiles(files);
-                console.log("ONDROPFUNCTION!!!!")
-            }
-        }
-
-        var dropArea = new jsondrop('fileElem');
-    </script>
-
-    <!--
-    <script>
-        let dropArea = document.getElementById('drop-area')
-            ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, preventDefaults, false)
-            })
-
-        function preventDefaults(e) {
-            e.preventDefault()
-            e.stopPropagation()
-        }
-
-        ;['dragenter', 'dragover'].forEach(eventName => {
-            dropArea.addEventListener(eventName, highlight, false)
-        })
-
-            ;['dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, unhighlight, false)
-            })
-
-        function highlight(e) {
-            dropArea.classList.add('highlight')
-        }
-
-        function unhighlight(e) {
-            dropArea.classList.remove('highlight')
-        }
-
-        dropArea.addEventListener('drop', handleDrop, false)
-
-        function handleDrop(e) {
-            let dt = e.dataTransfer
-            let files = dt.files
-
-            handleFiles(files)
-        }
-
-        function handleFiles(files) {
-            files = [...files]
-            files.forEach(uploadFile)
-            files.forEach(previewFile)
-        }
-
-        function uploadFile(file) {
-            var url = '../api/Servers'
-            var xhr = new XMLHttpRequest()
-            var formData = new FormData()
-            xhr.open('POST', url, true)
-
-            xhr.addEventListener('readystatechange', function (e) {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    // Done. Inform the user
-                }
-                else if (xhr.readyState == 4 && xhr.status != 200) {
-                    // Error. Inform the user
-                }
-            })
-
-            formData.append('file', file)
-            xhr.send(formData)
-        }
-
-        function previewFile(file) {
-            let reader = new FileReader()
-            reader.readAsDataURL(file)
-            reader.onloadend = function () {
-                let img = document.createElement('img')
-                img.src = reader.result
-                document.getElementById('gallery').appendChild(img)
-            }
-        }
-
-        let filesDone = 0
-        let filesToDo = 0
-        let progressBar = document.getElementById('progress-bar')
-
-        function initializeProgress(numfiles) {
-            progressBar.value = 0
-            filesDone = 0
-            filesToDo = numfiles
-        }
-
-        function progressDone() {
-            filesDone++
-            progressBar.value = filesDone / filesToDo * 100
-        }
-    </script>
-        -->
 
 
 </body>
