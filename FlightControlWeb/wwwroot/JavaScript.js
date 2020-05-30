@@ -16,7 +16,7 @@ function ParseDataToLine(data,id) {
     removePolyLine();
     addHomeMarker(data.initial_location["latitude"], data.initial_location["longitude"]);
     addDestMarker(data.segments[arr.length - 1]["latitude"], data.segments[arr.length - 1]["longitude"]);
-    var polyline = L.polyline(marray, { color: 'red' }).addTo(map);
+    var polyline = L.polyline(marray, { color: 'red', dashArray: '20, 20', dashOffset: '0'}).addTo(map);
     polyline.addTo(layerGroup);
     polyid = id;
 }
@@ -40,7 +40,12 @@ function createMap() {
 
 
     map.on('click', function (e) {
-        //click on the map event
+                //click on the map event
+        //remove data from details tbl
+        var count = $('#tblDetails tr').length;
+        if (count > 1) {
+            document.getElementById("tblDetails").deleteRow(1);
+        }
         //delete the polyline from the map.
         if (polyid != null) {
             removePolyLine();
@@ -53,7 +58,7 @@ function createIcon() {
     var iconPlane = L.icon({
         iconUrl: 'https://img.icons8.com/color/48/000000/airplane-mode-on.png',
         iconSize: [50, 40],
-        iconAnchor: [0, 0],
+        iconAnchor: [25, 25],
         popupAnchor: [0, 0]
     })
 
@@ -119,8 +124,6 @@ function deleteOnClick(el) {
 
     // remove the marker
     var markerToDel = markersMap[firstID];
-    //markerToDel.closePopup();
-    //markersMap.delete(firstID);
     map.removeLayer(markerToDel);
     if (polyid == firstID) {
         removePolyLine();
@@ -171,8 +174,6 @@ function flightOnClick(e, flag) {
         method: 'GET',
         success: function (flightPlan) {
 
-            console.log(flightPlan);
-
             // show the details in the flight details table
             var count = $('#tblDetails tr').length;
             if (count > 1) {
@@ -205,17 +206,13 @@ function flightOnClick(e, flag) {
 function addMarkerToMap(lat, lon, id) {
     //creating the icon
     var iconPlane = createIcon();
-
-        let marker = L.marker([lat, lon], { icon: iconPlane }).addTo(map);
-        marker.addTo(planeLayerGroup);
+    let marker = L.marker([lat, lon], { icon: iconPlane, rotationAngle: Math.atan2(0, 0) }).addTo(map);
+    marker.addTo(planeLayerGroup);
+    marker.bindPopup(id);
         marker.on("click", function () {
-            flightOnClick(id, 1)
+            flightOnClick(id, 1);
         });
-        markersMap[id] = marker;
-  //  }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////
-    //marker.bindPopup(id).openPopup();
+    markersMap[id] = marker;
 }
 
 function addHomeMarker(lat, lon) {
@@ -258,4 +255,80 @@ function getFlightData() {
             addMarkerToMap(latitude, longtitude,  flightid);
         });
     });
+}
+
+var jsondrop = function (elem, inputElem, options) {
+    this.element = document.getElementById(elem);
+    this.inputElement = document.getElementById(inputElem);
+    this.options = options || {};
+    this.name = 'jsondrop';
+    this.files = [];
+    this._addEventHandlers();
+}
+
+jsondrop.prototype._readFiles = function (files) {
+    var _this = this;
+    for (i = 0; i < files.length; i++) {
+        (function (file) {
+            var fr = new FileReader();
+            fr.readAsText(file, 'UTF-8');
+            fr.onload = function () {
+                var json = JSON.parse(fr.result);
+                $.ajax({
+                    type: "POST",
+                    url: "api/FlightPlan",
+                    data: JSON.stringify(json),
+                    contentType: "application/json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert("Request: " + XMLHttpRequest + "\n\nStatus: " + textStatus + "\n\nError: " + errorThrown);
+                    }
+
+                });
+            };
+        })(files[i]);
+    }
+}
+
+
+jsondrop.prototype._addEventHandlers = function () {
+
+    // bind jsondrop to _this for use in 'ondrop'
+    var _this = this;
+
+    this.element.addEventListener('dragover', ondragover, false);
+    this.element.addEventListener('dragleave', ondragleave, false);
+    this.element.addEventListener('drop', ondrop, false);
+    this.inputElement.onchange = function (e) {
+        e = document.getElementById('fileElem');
+        e = e || event;
+        this.className = 'list_in';
+        _this._readFiles(e.files);
+    };
+
+
+    function ondragover(e) {
+        $("#tblInternalFlights").hide();
+        $("#choina").hide();
+        e = e || event;
+        e.preventDefault();
+        this.className = 'dragging';
+    }
+
+    function ondragleave(e) {   //not working
+        e = e || event;
+        e.preventDefault();
+        this.className = 'list_in';
+        $("#tblInternalFlights").show();
+        $("#choina").show();
+    }
+
+    function ondrop(e) {
+        e = e || event;
+        e.preventDefault();
+        this.className = 'list_in';
+        files = e.dataTransfer.files;
+        _this._readFiles(files);
+        $("#tblInternalFlights").show();
+        $("#choina").show();
+    }
 }

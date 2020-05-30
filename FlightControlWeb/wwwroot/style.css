@@ -59,3 +59,10 @@
 .tableRow:hover {
     background-color: #73b6e6;
 }
+
+.dragging {
+    background-image: url('drop-files-here-extra.jpg');
+    grid-column: 2;
+    grid-row: 1;
+    overflow: scroll;
+}
