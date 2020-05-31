@@ -35,6 +35,9 @@ namespace FlightControlWeb.Model.Managers
             // get the list from the cache
             var serversList = ((IEnumerable<Server>)cache.Get("servers")).ToList();
 
+            // insert the list to the cache
+            cache.Set("servers", serversList);
+
             return serversList;
         }
 
