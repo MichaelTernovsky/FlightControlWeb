@@ -38,7 +38,7 @@
                             <th style="font-size:smaller">Company Name</th>
                             <th style="font-size:smaller">Final Longitude</th>
                             <th style="font-size:smaller">Final Latitude</th>
-                            <th style="font-size:smaller">End Time</th>
+                            <th style="font-size:smaller">Arrival Universal Time</th>
                             <th> </th>
                         </tr>
                     </thead>
@@ -64,13 +64,13 @@
             <!--drug and drop Script-->
             <div class="drop">
                 <!--TEST DRUG AND DROP!-->
-                    <form class="my-form" id="choina">
-                        <div id="gallery"></div>
-                        <!--<p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>-->
-                        <input type="file" id="fileElem" multiple accept="JSON/*">
-                        <!--onchange="handleFiles(this.files)"-->
-                        <label class="button" for="fileElem">Select some files</label>
-                    </form>
+                <form class="my-form" id="choina">
+                    <div id="gallery"></div>
+                    <!--<p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>-->
+                    <input type="file" id="fileElem" multiple accept="JSON/*">
+                    <!--onchange="handleFiles(this.files)"-->
+                    <label class="button" for="fileElem">Select some files</label>
+                </form>
             </div>
             <script>
                 let dropArea = new jsondrop('list_in', 'fileElem');
@@ -99,8 +99,6 @@
 
     <script>createMap();</script>
     <script>setInterval(getFlightData, 3000);</script>
-
-
 
 </body>
 </html>

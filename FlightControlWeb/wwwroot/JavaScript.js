@@ -12,7 +12,7 @@ function ParseDataToLine(data, id) {
     for (let i = 0; i < arr.length; i++) {
         marray.push([data.segments[i]["latitude"], data.segments[i]["longitude"]]);
     };
-    //layerGroup is create to able to dealte the polyline later.
+    // layerGroup is create to able to dealte the polyline later.
     removePolyLine();
     addHomeMarker(data.initial_location["latitude"], data.initial_location["longitude"]);
     addDestMarker(data.segments[arr.length - 1]["latitude"], data.segments[arr.length - 1]["longitude"]);
@@ -21,7 +21,7 @@ function ParseDataToLine(data, id) {
     polyid = id;
 }
 function drawLine(id) {
-    //use getJson to get a FlightPlan by id and then parse it to data and draw the line on the map.
+    // use getJson to get a FlightPlan by id and then parse it to data and draw the line on the map.
     flightPlanUrl = "/api/FlightPlan/"
     $.getJSON(flightPlanUrl + id, function (data) {
         ParseDataToLine(data, id);
@@ -130,7 +130,7 @@ function deleteOnClick(el) {
     $.ajax({
         url: urlDelete,
         method: 'delete',
-        error: function (jqXHR, textSatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
             alert(textStatus + ":" + jqXHR.status + " " + errorThrown)
         }
     });
@@ -158,7 +158,7 @@ function showFlightInTables(flight) {
         $("#tblInternalFlights").append(`<tr class=\"tableRow\" id=${flight.flight_id} tabindex="0"><td onclick = flightOnClick(this,0)>` + flight.flight_id + "</td>" + "<td onclick = flightOnClick(this,0)>" + flight.company_name + "</td>" +
             "<td><button class=\"btn\" onclick = deleteOnClick(this)><i class=\"fa fa-trash\"></i></button></td>" + "</tr>");
     } else {
-        $("#tblExternalFlights").append(`<tr class=\"tableRow\" id=${flight.flight_id} tabindex="0"><td onclick = flightOnClick(this,0)>` + flight.flight_id + "</td>" + "<td onclick=flightOnClick(this,0)>" + flight.company_name + "</td>");
+        $("#tblExternalFlights").append(`<tr class=\"tableRow\" id=${flight.flight_id} tabindex="0"><td onclick = flightOnClick(this,0)>` + flight.flight_id + "</td>" + "<td onclick=flightOnClick(this,0)>" + flight.company_name + "</td><td></td><td></td>");
     }
 }
 
@@ -221,10 +221,12 @@ function flightOnClick(e, flag) {
                 endlTime.setSeconds(addTime);
             })
 
+            let stringDate = endlTime.toString().substr(0, 25);
+
             //write the new details
-            $("#tblDetails").append("<tr class=\"detailRow\"><td>" + id + "</td>" + "<td>" + initialLon + "</td>" + "<td>" + initialLat + "</td>" + "<td>" + flightPlan.initial_location.date_time + "</td>" + "<td>" + flightPlan.passengers + "</td>" + "<td>" + flightPlan.company_name + "</td>" + "<td>" + finalLon + "</td>" + "<td>" + finalLat + "</td>" + "<td>" + endlTime + "</td>" + "<td></tr>");
+            $("#tblDetails").append("<tr class=\"detailRow\"><td>" + id + "</td>" + "<td>" + initialLon + "</td>" + "<td>" + initialLat + "</td>" + "<td>" + flightPlan.initial_location.date_time + "</td>" + "<td>" + flightPlan.passengers + "</td>" + "<td>" + flightPlan.company_name + "</td>" + "<td>" + finalLon + "</td>" + "<td>" + finalLat + "</td>" + "<td>" + stringDate + "</td>" + "<td></tr>");
         },
-        error: function (jqXHR, textSatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
             alert(textStatus + ":" + jqXHR.status + " " + errorThrown)
         }
     });
@@ -301,13 +303,13 @@ function getAngleBySegArr(latitude, longtitude, flightId) {
                 seg = [segLat, segLon];
                 answer.push(seg);
             });
+            angle = calcAngle(latitude, longtitude, answer);
+            return angle;
         },
-        error: function (jqXHR, textSatus, errorThrown) {
+        error: function (jqXHR, textStatus, errorThrown) {
             alert(textStatus + ":" + jqXHR.status + " " + errorThrown)
         }
     });
-    angle = calcAngle(latitude, longtitude, answer);
-    return angle;
 }
 
 function getFlightData() {
@@ -318,15 +320,26 @@ function getFlightData() {
     let currentDate = date;
 
     $.getJSON(url + currentDate + "&sync_all", function (data) {
+        let flag = 0;
+
         //clear all the planes markers from the map
         planeLayerGroup.clearLayers();
+
         // clear the table
         clearTables();
+
+        // get the id from the details table
+        let id = jQuery(".detailRow").find("td:eq(0)").text();
+
         // show the flights in the tables
         data.forEach(function (flight) {
-
             // showing the flights in the correct tables
             showFlightInTables(flight);
+
+            // delete details if needed
+            if (id == flight.flight_id) {
+                flag = 1;
+            }
 
             // saving the values
             let longtitude = flight.longitude;
@@ -335,6 +348,11 @@ function getFlightData() {
             let angle = getAngleBySegArr(latitude, longtitude, flight.flight_id);
             addMarkerToMap(latitude, longtitude, flightid, angle);
         });
+
+        if (flag == 0) {
+            clearFlightDetails(id);
+            removePolyLine(id);
+        }
     });
 }
 
@@ -370,7 +388,6 @@ jsondrop.prototype._readFiles = function (files) {
     }
 }
 
-
 jsondrop.prototype._addEventHandlers = function () {
 
     // bind jsondrop to _this for use in 'ondrop'
@@ -395,7 +412,7 @@ jsondrop.prototype._addEventHandlers = function () {
         this.className = 'dragging';
     }
 
-    function ondragleave(e) {   //not working
+    function ondragleave(e) {
         e = e || event;
         e.preventDefault();
         this.className = 'list_in';
