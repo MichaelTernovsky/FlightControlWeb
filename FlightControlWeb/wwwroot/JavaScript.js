@@ -70,7 +70,7 @@ function createIconBold() {
     //icon
     let iconPlane2 = L.icon({
         iconUrl: 'https://img.icons8.com/nolan/48/airplane-mode-on.png',
-        iconSize: [50, 40d
+        iconSize: [50, 40],
         iconAnchor: [25, 25],
         popupAnchor: [-20, -20]
     })
