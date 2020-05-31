@@ -32,14 +32,8 @@ namespace FlightControlWeb.Controllers
         [HttpPost]
         public ActionResult AddNewServer(Server newServer)
         {
-            // check if the flight plan is valid
-            if (ModelState.IsValid)
-            {
-                this.serverManager.addNewServer(newServer);
-                return CreatedAtAction(actionName: "AddNewServer", newServer);
-            }
-            else
-                return BadRequest();
+            this.serverManager.addNewServer(newServer);
+            return CreatedAtAction(actionName: "AddNewServer", newServer);
         }
 
         // GET: api/Servers/5
