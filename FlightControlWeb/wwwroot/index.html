@@ -8,7 +8,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
     <script src="leaflet.rotatedMarker.js"></script>
@@ -49,13 +49,12 @@
         <div id="list_in" class="component list_in">
             <h3 class="internal_header">Internal Flights</h3>
             <br />
-            <div class="row text-center my-row">
+            <div class="my-row">
                 <table class="table internal_details_table" id="tblInternalFlights">
                     <thead>
                         <tr>
                             <th>Flight ID</th>
                             <th>Company Name</th>
-                            <th>Is External</th>
                             <th> </th>
                         </tr>
                     </thead>
@@ -74,7 +73,7 @@
                     </form>
             </div>
             <script>
-                var dropArea = new jsondrop('list_in', 'fileElem');
+                let dropArea = new jsondrop('list_in', 'fileElem');
             </script>
 
         </div>
@@ -82,13 +81,14 @@
         <div id="list_out" class="component list_out">
             <h3 class="external_header">External Flights</h3>
             <br />
-            <div class="row text-center my-row">
+            <div class="my-row">
                 <table class="table external_header" id="tblExternalFlights">
                     <thead>
                         <tr>
                             <th>Flight ID</th>
                             <th>Company Name</th>
-                            <th>Is External</th>
+                            <th> </th>
+                            <th> </th>
                         </tr>
                     </thead>
 
