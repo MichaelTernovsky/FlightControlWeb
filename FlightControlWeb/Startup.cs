@@ -57,12 +57,12 @@ namespace FlightControlWeb
 
             // creating the lists
             List<Server> serversList = new List<Server>();
-            //serversList.Add(new Server { ServerID = "111", ServerURL = "https://localhost:44355" });
-            //serversList.Add(new Server { ServerID = "222", ServerURL = "http://rony1.atwebpages.com" });
-            //serversList.Add(new Server { ServerID = "333", ServerURL = "http://rony2.atwebpages.com" });
-            //serversList.Add(new Server { ServerID = "444", ServerURL = "http://rony3.atwebpages.com" });
-            serversList.Add(new Server { ServerID = "555", ServerURL = "http://rony5.atwebpages.com" });
-            //serversList.Add(new Server { ServerID = "666", ServerURL = "http://rony6.atwebpages.com" });
+            serversList.Add(new Server { ServerID = "111", ServerURL = "https://localhost:44355" });
+         //   serversList.Add(new Server { ServerID = "222", ServerURL = "http://rony1.atwebpages.com" });
+         //   serversList.Add(new Server { ServerID = "333", ServerURL = "http://rony2.atwebpages.com" });
+         //   serversList.Add(new Server { ServerID = "444", ServerURL = "http://rony3.atwebpages.com" });
+        //    serversList.Add(new Server { ServerID = "555", ServerURL = "http://rony5.atwebpages.com" });
+         //   serversList.Add(new Server { ServerID = "666", ServerURL = "http://rony6.atwebpages.com" });
             List<Flight> flightsList = new List<Flight>();
             Dictionary<string, FlightPlan> flightsDict = new Dictionary<string, FlightPlan>();
             Dictionary<string, string> flightSource = new Dictionary<string, string>();
