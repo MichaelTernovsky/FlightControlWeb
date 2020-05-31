@@ -13,14 +13,14 @@ function ParseDataToLine(data, id) {
         marray.push([data.segments[i]["latitude"], data.segments[i]["longitude"]]);
     };
     // layerGroup is create to able to dealte the polyline later.
-    RemovePolyLine();
-    AddHomeMarker(data.initial_location["latitude"], data.initial_location["longitude"]);
-    AddDestMarker(data.segments[arr.length - 1]["latitude"], data.segments[arr.length - 1]["longitude"]);
+    removePolyLine();
+    addHomeMarker(data.initial_location["latitude"], data.initial_location["longitude"]);
+    addDestMarker(data.segments[arr.length - 1]["latitude"], data.segments[arr.length - 1]["longitude"]);
     let polyline = L.polyline(marray, { color: 'red', dashArray: '5, 5', dashOffset: '0' }).addTo(map);
     polyline.addTo(layerGroup);
     polyid = id;
 }
-function DrawLine(id) {
+function drawLine(id) {
     // use getJson to get a FlightPlan by id and then parse it to data and draw the line on the map.
     flightPlanUrl = "/api/FlightPlan/"
     $.getJSON(flightPlanUrl + id, function (data) {
@@ -28,7 +28,7 @@ function DrawLine(id) {
     });
 }
 
-function CreateMap() {
+function createMap() {
     //create map
     map = L.map('map').setView([34.873331, 32.006333], 1.5);
     L.tileLayer('https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=z9JRmQouqskUAwB0autN', {
@@ -48,12 +48,12 @@ function CreateMap() {
         }
         //delete the polyline from the map.
         if (polyid != null) {
-            RemovePolyLine();
+            removePolyLine();
         };
     })
 }
 
-function CreateIcon() {
+function createIcon() {
     //icon
     let iconPlane = L.icon({
         iconUrl: 'https://img.icons8.com/color/48/000000/airplane-mode-on.png',
@@ -66,7 +66,7 @@ function CreateIcon() {
 }
 
 
-function CreateIconBold() {
+function createIconBold() {
     //icon
     let iconPlane2 = L.icon({
         iconUrl: 'https://img.icons8.com/nolan/48/airplane-mode-on.png',
@@ -78,7 +78,7 @@ function CreateIconBold() {
     return iconPlane2;
 }
 
-function CreateHomeIcon() {
+function createHomeIcon() {
     //icon
     let iconHome = L.icon({
         iconUrl: 'https://img.icons8.com/color/48/000000/order-delivered.png',
@@ -89,7 +89,7 @@ function CreateHomeIcon() {
     return iconHome;
 }
 
-function CreateDestIcon() {
+function createDestIcon() {
     //icon
     let iconHome = L.icon({
         iconUrl: 'https://img.icons8.com/color/48/000000/filled-flag2.png',
@@ -100,13 +100,13 @@ function CreateDestIcon() {
     return iconHome;
 }
 
-function ClearTables() {
+function clearTables() {
     // delete the current values in both inetranl end external tables
     $('#tblInternalFlights tr:gt(0)').remove()
     $('#tblExternalFlights tr:gt(0)').remove()
 }
 
-function ClearFlightDetails(flightID) {
+function clearFlightDetails(flightID) {
     //remove from flight details table
     let id = jQuery(".detailRow").find("td:eq(0)").text();
 
@@ -118,7 +118,7 @@ function ClearFlightDetails(flightID) {
     }
 }
 
-function DeleteOnClick(el) {
+function deleteOnClick(el) {
     //delete flight from evreywhere
     let row = $(el).closest('tr');
     row.remove();
@@ -136,33 +136,33 @@ function DeleteOnClick(el) {
     });
 
     // removing flight details from the table of details
-    ClearFlightDetails(firstID);
+    clearFlightDetails(firstID);
 
     // remove the marker
     let markerToDel = markersMap[firstID];
     map.removeLayer(markerToDel);
     if (polyid == firstID) {
-        RemovePolyLine();
+        removePolyLine();
     }
     delete markerToDel;
 }
 
-function RemovePolyLine() {
+function removePolyLine() {
     layerGroup.clearLayers();
     polyid = null;
 }
 
-function ShowFlightInTables(flight) {
+function showFlightInTables(flight) {
     // show the flights
     if (flight.is_external === false) {
-        $("#tblInternalFlights").append(`<tr class=\"tableRow\" id=${flight.flight_id} tabindex="0"><td onclick = FlightOnClick(this,0)>` + flight.flight_id + "</td>" + "<td onclick = FlightOnClick(this,0)>" + flight.company_name + "</td>" +
-            "<td><button class=\"btn\" onclick = DeleteOnClick(this)><i class=\"fa fa-trash\"></i></button></td>" + "</tr>");
+        $("#tblInternalFlights").append(`<tr class=\"tableRow\" id=${flight.flight_id} tabindex="0"><td onclick = flightOnClick(this,0)>` + flight.flight_id + "</td>" + "<td onclick = flightOnClick(this,0)>" + flight.company_name + "</td>" +
+            "<td><button class=\"btn\" onclick = deleteOnClick(this)><i class=\"fa fa-trash\"></i></button></td>" + "</tr>");
     } else {
-        $("#tblExternalFlights").append(`<tr class=\"tableRow\" id=${flight.flight_id} tabindex="0"><td onclick = FlightOnClick(this,0)>` + flight.flight_id + "</td>" + "<td onclick=FlightOnClick(this,0)>" + flight.company_name + "</td><td></td><td></td>");
+        $("#tblExternalFlights").append(`<tr class=\"tableRow\" id=${flight.flight_id} tabindex="0"><td onclick = flightOnClick(this,0)>` + flight.flight_id + "</td>" + "<td onclick=flightOnClick(this,0)>" + flight.company_name + "</td><td></td><td></td>");
     }
 }
 
-function FlightOnClick(e, flag) {
+function flightOnClick(e, flag) {
     let id;
 
     if (flag == 0) {
@@ -175,7 +175,7 @@ function FlightOnClick(e, flag) {
     }
 
     // draw the path
-    DrawLine(id);
+    drawLine(id);
 
     // mark the line in the table
     if (tblInternalFlights.rows[id]) {
@@ -190,7 +190,7 @@ function FlightOnClick(e, flag) {
 
     // show the marker popup
     let marker = markersMap[id];
-    let boldIcon = CreateIconBold();
+    let boldIcon = createIconBold();
     marker.openPopup();
     marker.setIcon(boldIcon);
     // createt thr url
@@ -232,19 +232,19 @@ function FlightOnClick(e, flag) {
     });
 }
 
-function AddMarkerToMap(lat, lon, id, angle) {
+function addMarkerToMap(lat, lon, id, angle) {
     //creating the icon
-    let iconPlane = CreateIcon();
+    let iconPlane = createIcon();
     let marker = L.marker([lat, lon], { icon: iconPlane, rotationAngle: angle }).addTo(map);
     marker.addTo(planeLayerGroup);
     marker.bindPopup(id);
     marker.on("click", function () {
-        FlightOnClick(id, 1);
+        flightOnClick(id, 1);
     });
     markersMap[id] = marker;
 }
 
-function IfOnLine(linep1x, linep1y, linep2x, linep2y, px, py) {
+function ifOnLine(linep1x, linep1y, linep2x, linep2y, px, py) {
     //check if point is between 2 point(on line).
     let distance = function (p1x, p1y, p2x, p2y) {
         return Math.sqrt(Math.pow(p1x - p2x, 2) + Math.pow(p1y - p2y, 2));
@@ -253,7 +253,7 @@ function IfOnLine(linep1x, linep1y, linep2x, linep2y, px, py) {
     return true ? dist_sum == Math.round(distance(linep1x, linep1y, linep2x, linep2y)) : false;
 }
 
-function CalcAngle(lat, lon, segArr) {
+function calcAngle(lat, lon, segArr) {
     //calc the current angle of the plane
     current_lat = lat;
     current_lon = lon;
@@ -261,7 +261,7 @@ function CalcAngle(lat, lon, segArr) {
     for (i = 0; i < segArr.length - 1; i++) {
 
         //check of evrey seg if its the current seg
-        if (IfOnLine(segArr[i][0], segArr[i][1], segArr[i + 1][0], segArr[i + 1][1], current_lat, current_lon) == true) {
+        if (ifOnLine(segArr[i][0], segArr[i][1], segArr[i + 1][0], segArr[i + 1][1], current_lat, current_lon) == true) {
             break;
         }
     }
@@ -270,19 +270,19 @@ function CalcAngle(lat, lon, segArr) {
     return angleDeg;
 }
 
-function AddHomeMarker(lat, lon) {
-    let iconHome = CreateHomeIcon();
+function addHomeMarker(lat, lon) {
+    let iconHome = createHomeIcon();
     let marker = L.marker([lat, lon], { icon: iconHome }).addTo(map);
     marker.addTo(layerGroup);
 }
 
-function AddDestMarker(lat, lon) {
-    let iconDest = CreateDestIcon();
+function addDestMarker(lat, lon) {
+    let iconDest = createDestIcon();
     let marker = L.marker([lat, lon], { icon: iconDest }).addTo(map);
     marker.addTo(layerGroup);
 }
 
-function GetAngleBySegArr(latitude, longtitude, flightId) {
+function getAngleBySegArr(latitude, longtitude, flightId) {
 
     let url = "/api/FlightPlan/" + flightId;
     let answer = [];
@@ -303,7 +303,7 @@ function GetAngleBySegArr(latitude, longtitude, flightId) {
                 seg = [segLat, segLon];
                 answer.push(seg);
             });
-            angle = CalcAngle(latitude, longtitude, answer);
+            angle = calcAngle(latitude, longtitude, answer);
             return angle;
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -312,7 +312,7 @@ function GetAngleBySegArr(latitude, longtitude, flightId) {
     });
 }
 
-function GetFlightData() {
+function getFlightData() {
 
     let date = new Date().toISOString().substr(0, 19);
     //use the data from the server to fill the tables and mark the map 
@@ -326,7 +326,7 @@ function GetFlightData() {
         planeLayerGroup.clearLayers();
 
         // clear the table
-        ClearTables();
+        clearTables();
 
         // get the id from the details table
         let id = jQuery(".detailRow").find("td:eq(0)").text();
@@ -334,7 +334,7 @@ function GetFlightData() {
         // show the flights in the tables
         data.forEach(function (flight) {
             // showing the flights in the correct tables
-            ShowFlightInTables(flight);
+            showFlightInTables(flight);
 
             // delete details if needed
             if (id == flight.flight_id) {
@@ -345,13 +345,13 @@ function GetFlightData() {
             let longtitude = flight.longitude;
             let latitude = flight.latitude;
             let flightid = flight.flight_id;
-            let angle = GetAngleBySegArr(latitude, longtitude, flight.flight_id);
-            AddMarkerToMap(latitude, longtitude, flightid, angle);
+            let angle = getAngleBySegArr(latitude, longtitude, flight.flight_id);
+            addMarkerToMap(latitude, longtitude, flightid, angle);
         });
 
         if (flag == 0) {
-            ClearFlightDetails(id);
-            RemovePolyLine(id);
+            clearFlightDetails(id);
+            removePolyLine(id);
         }
     });
 }
@@ -393,9 +393,9 @@ jsondrop.prototype._addEventHandlers = function () {
     // bind jsondrop to _this for use in 'ondrop'
     let _this = this;
 
-    this.element.addEventListener('dragover', OnDragOver, false);
-    this.element.addEventListener('dragleave', OnDragLeave, false);
-    this.element.addEventListener('drop', OnDrop, false);
+    this.element.addEventListener('dragover', ondragover, false);
+    this.element.addEventListener('dragleave', ondragleave, false);
+    this.element.addEventListener('drop', ondrop, false);
     this.inputElement.onchange = function (e) {
         e = document.getElementById('fileElem');
         e = e || event;
@@ -404,7 +404,7 @@ jsondrop.prototype._addEventHandlers = function () {
     };
 
 
-    function OnDragOver(e) {
+    function ondragover(e) {
         $("#tblInternalFlights").hide();
         $("#choina").hide();
         e = e || event;
@@ -412,7 +412,7 @@ jsondrop.prototype._addEventHandlers = function () {
         this.className = 'dragging';
     }
 
-    function OnDragLeave(e) {
+    function ondragleave(e) {
         e = e || event;
         e.preventDefault();
         this.className = 'list_in';
@@ -420,7 +420,7 @@ jsondrop.prototype._addEventHandlers = function () {
         $("#choina").show();
     }
 
-    function OnDrop(e) {
+    function ondrop(e) {
         e = e || event;
         e.preventDefault();
         this.className = 'list_in';
