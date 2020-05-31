@@ -11,15 +11,20 @@ namespace FlightControlWeb.Model.ConcreteObjects
      */
     public class Segment
     {
-        [JsonPropertyName("longitude")]
         [JsonProperty("longitude")]
-        public double Longitude { get; set; }
-        [JsonPropertyName("latitude")]
+        [JsonPropertyName("longitude")]
+        [Range(-180.0, 180.0)]
+        public double Longitude { get; set; } = 200;
+
         [JsonProperty("latitude")]
-        public double Latitude { get; set; }
-        [JsonPropertyName("timeSpan_seconds")]
-        [JsonProperty("timeSpan_seconds")]
-        public double TimeSpanSeconds { get; set; }
+        [JsonPropertyName("latitude")]
+        [Range(-90.0, 90.0)]
+        public double Latitude { get; set; } = 100;
+
+        [JsonProperty("timespan_seconds")]
+        [JsonPropertyName("timespan_seconds")]
+        [Range(0, Double.MaxValue - 1)]
+        public double TimeSpanSeconds { get; set; } = -1;
     }
 
     /*
@@ -27,15 +32,19 @@ namespace FlightControlWeb.Model.ConcreteObjects
      */
     public class InitialLocation
     {
-        [JsonPropertyName("longitude")]
         [JsonProperty("longitude")]
-        public double Longitude { get; set; }
-        [JsonPropertyName("latitude")]
+        [JsonPropertyName("longitude")]
+        [Range(-180.0, 180.0)]
+        public double Longitude { get; set; } = 200;
+
         [JsonProperty("latitude")]
-        public double Latitude { get; set; }
-        [JsonPropertyName("date_time")]
+        [JsonPropertyName("latitude")]
+        [Range(-90.0, 90.0)]
+        public double Latitude { get; set; } = 100;
+
         [JsonProperty("date_time")]
-        [Required]
+        [JsonPropertyName("date_time")]
+        [Range(typeof(DateTime), "0001-01-01T00:00:00Z", "9999-12-31T11:59:59Z")]
         public DateTime DateTime { get; set; }
     }
 
@@ -46,17 +55,21 @@ namespace FlightControlWeb.Model.ConcreteObjects
     {
         [JsonPropertyName("passengers")]
         [JsonProperty("passengers")]
-        public int Passengers { get; set; }
-        [JsonPropertyName("company_name")]
+        [Range(0, Int32.MaxValue - 1)]
+        public int Passengers { get; set; } = -1;
+
         [JsonProperty("company_name")]
+        [JsonPropertyName("company_name")]
         [Required]
         public string CompanyName { get; set; }
-        [JsonPropertyName("initial_location")]
+
         [JsonProperty("initial_location")]
+        [JsonPropertyName("initial_location")]
         [Required]
         public InitialLocation InitialLocation { get; set; }
-        [JsonPropertyName("segments")]
+
         [JsonProperty("segments")]
+        [JsonPropertyName("segments")]
         [Required]
         public IEnumerable<Segment> Segments { get; set; }
     }
