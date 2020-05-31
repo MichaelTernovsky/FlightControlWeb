@@ -131,7 +131,7 @@ function deleteOnClick(el) {
         url: urlDelete,
         method: 'delete',
         error: function (jqXHR, textStatus, errorThrown) {
-            alert(textStatus + ":" + jqXHR.status + " " + errorThrown)
+            alert(textStatus + ":" + jqXHR.status + " - " + "Could not delete the file")
         }
     });
 
@@ -227,7 +227,7 @@ function flightOnClick(e, flag) {
             $("#tblDetails").append("<tr class=\"detailRow\"><td>" + id + "</td>" + "<td>" + initialLon + "</td>" + "<td>" + initialLat + "</td>" + "<td>" + flightPlan.initial_location.date_time + "</td>" + "<td>" + flightPlan.passengers + "</td>" + "<td>" + flightPlan.company_name + "</td>" + "<td>" + finalLon + "</td>" + "<td>" + finalLat + "</td>" + "<td>" + stringDate + "</td>" + "<td></tr>");
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            alert(textStatus + ":" + jqXHR.status + " " + errorThrown)
+            alert(textStatus + ":" + jqXHR.status + " - " + "Could not get the flight details")
         }
     });
 }
@@ -307,7 +307,7 @@ function getAngleBySegArr(latitude, longtitude, flightId) {
             return angle;
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            alert(textStatus + ":" + jqXHR.status + " " + errorThrown)
+            alert(textStatus + ":" + jqXHR.status + " - " + "Could not get the flight details")
         }
     });
 }
@@ -379,7 +379,7 @@ jsondrop.prototype._readFiles = function (files) {
                     data: JSON.stringify(json),
                     contentType: "application/json",
                     error: function (XMLHttpRequest, textStatus, errorThrown) {
-                        alert("Request: " + XMLHttpRequest + "\n\nStatus: " + textStatus + "\n\nError: " + errorThrown);
+                        alert("Request: " + XMLHttpRequest + "\n\nStatus: " + textStatus + "\n\nError: " + "Problem in Json file");
                     }
 
                 });
