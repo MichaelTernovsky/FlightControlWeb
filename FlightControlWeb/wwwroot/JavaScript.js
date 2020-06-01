@@ -22,7 +22,7 @@ function ParseDataToLine(data, id) {
 }
 function DrawLine(id) {
     // use getJson to get a FlightPlan by id and then parse it to data and draw the line on the map.
-    flightPlanUrl = "/api/FlightPlan/"
+    let flightPlanUrl = "/api/FlightPlan/"
     $.getJSON(flightPlanUrl + id, function (data) {
         ParseDataToLine(data, id);
     });
@@ -39,7 +39,7 @@ function CreateMap() {
     planeLayerGroup = L.layerGroup().addTo(map);
 
 
-    map.on('click', function (e) {
+    map.on('click', function () {
         //click on the map event
         //remove data from details tbl
         let count = $('#tblDetails tr').length;
@@ -49,7 +49,7 @@ function CreateMap() {
         //delete the polyline from the map.
         if (polyid != null) {
             RemovePolyLine();
-        };
+        }
     })
 }
 
