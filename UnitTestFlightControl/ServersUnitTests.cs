@@ -37,7 +37,7 @@ namespace UnitTestFlightControl
             // creating the manager
             IServerManager serverManager = new ServerManager(_cache);
 
-            var actual = (List<Server>)serverManager.getAllExternalServers();
+            var actual = (List<Server>)serverManager.GetAllExternalServers();
             var expected = serversList;
 
             // the list should contain the same number of elements
@@ -68,7 +68,7 @@ namespace UnitTestFlightControl
             // creating the manager
             IServerManager serverManager = new ServerManager(_cache);
 
-            var actual = serverManager.getServer(newServer.ServerID);
+            var actual = serverManager.GetServer(newServer.ServerID);
             var expected = newServer;
             var fakeServer = new Server { ServerID = "111", ServerURL = "111" };
 
@@ -93,9 +93,9 @@ namespace UnitTestFlightControl
             IServerManager serverManager = new ServerManager(_cache);
 
             // adding the server to the list
-            serverManager.addNewServer(newServer);
+            serverManager.AddNewServer(newServer);
 
-            var actual = serverManager.getServer(newServer.ServerID);
+            var actual = serverManager.GetServer(newServer.ServerID);
             var expected = newServer;
             var fakeServer = new Server { ServerID = "111", ServerURL = "111" };
 
@@ -120,12 +120,12 @@ namespace UnitTestFlightControl
             IServerManager serverManager = new ServerManager(_cache);
 
             // adding the server to the list
-            serverManager.addNewServer(newServer);
+            serverManager.AddNewServer(newServer);
 
             // deleting the server we just added
-            serverManager.deleteServer(newServer.ServerID);
+            serverManager.DeleteServer(newServer.ServerID);
 
-            var actual = (List<Server>)serverManager.getAllExternalServers();
+            var actual = (List<Server>)serverManager.GetAllExternalServers();
 
             // the list should be empty
             Assert.IsTrue(actual != null);

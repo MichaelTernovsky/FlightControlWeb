@@ -40,12 +40,12 @@ namespace FlightControlWeb.Controllers
                 // return the correct list according to the "sync_all"
                 if (isExternal)
                 {
-                    IEnumerable<Flight> flights = await this.flightsModel.getAllFlights(convertedTime)
+                    IEnumerable<Flight> flights = await this.flightsModel.GetAllFlights(convertedTime)
                         ;
                     return CreatedAtAction(actionName: "GetAllFlights", flights);
                 }
                 else
-                    return CreatedAtAction(actionName: "GetAllFlights", await flightsModel.getAllInternalFlights(convertedTime));
+                    return CreatedAtAction(actionName: "GetAllFlights", await flightsModel.GetAllInternalFlights(convertedTime));
             }
             catch
             {
@@ -59,8 +59,8 @@ namespace FlightControlWeb.Controllers
         {
             try
             {
-                this.flightsModel.deleteFlight(id);
-                this.flihtPlansModel.deleteFlightPlan(id);
+                this.flightsModel.DeleteFlight(id);
+                this.flihtPlansModel.DeleteFlightPlan(id);
                 return CreatedAtAction(actionName: "DeleteFlight", "Flight with ID " + id + " deleted");
             }
             catch

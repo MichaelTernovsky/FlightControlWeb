@@ -13,10 +13,10 @@ namespace FlightControlWeb.Model.Interfaces
      */
     public interface IFlightPlanManager
     {
-        void addNewFlightPlan(FlightPlan newFlightPlan, string flightID);
-        Task<FlightPlan> getFlightPlan(string flight_id);
-        void deleteFlightPlan(string flight_id);
-        string generateFlight_Id(string companyName);
-        int isIdExist(string flight_id);
+        void AddNewFlightPlan(FlightPlan newFlightPlan, string flightID);
+        Task<FlightPlan> GetFlightPlan(string flight_id);
+        void DeleteFlightPlan(string flight_id);
+        string GenerateFlightId(string companyName);
+        int IsIdExist(string flight_id);
     }
 }

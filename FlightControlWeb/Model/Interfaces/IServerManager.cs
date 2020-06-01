@@ -12,9 +12,9 @@ namespace FlightControlWeb.Model.Interfaces
      */
     public interface IServerManager
     {
-        IEnumerable<Server> getAllExternalServers();
-        void addNewServer(Server newServer);
-        void deleteServer(string serverID);
-        Server getServer(string serverID);
+        IEnumerable<Server> GetAllExternalServers();
+        void AddNewServer(Server newServer);
+        void DeleteServer(string serverID);
+        Server GetServer(string serverID);
     }
 }

@@ -19,7 +19,7 @@ namespace FlightControlWeb.Model.Managers
         }
 
         // Servers method implemantaion
-        public void addNewServer(Server newServer)
+        public void AddNewServer(Server newServer)
         {
             // get the list from the cache
             var serversList = ((IEnumerable<Server>)cache.Get("servers")).ToList();
@@ -30,7 +30,7 @@ namespace FlightControlWeb.Model.Managers
             cache.Set("servers", serversList);
         }
 
-        public IEnumerable<Server> getAllExternalServers()
+        public IEnumerable<Server> GetAllExternalServers()
         {
             // get the list from the cache
             var serversList = ((IEnumerable<Server>)cache.Get("servers")).ToList();
@@ -41,12 +41,13 @@ namespace FlightControlWeb.Model.Managers
             return serversList;
         }
 
-        public void deleteServer(string serverID)
+        public void DeleteServer(string serverID)
         {
             // get the list from the cache
             var serversList = ((IEnumerable<Server>)cache.Get("servers")).ToList();
 
-            Server getServer = serversList.Where(x => String.Equals(x.ServerID, serverID)).FirstOrDefault();
+            Server getServer = serversList.Where(x => String.Equals(x.ServerID, serverID))
+                .FirstOrDefault();
 
             // insert the list to the cache
             cache.Set("servers", serversList);
@@ -57,11 +58,12 @@ namespace FlightControlWeb.Model.Managers
                 throw new Exception("Server does not exist");
         }
 
-        public Server getServer(string serverID)
+        public Server GetServer(string serverID)
         {
             // get the list from the cache
             var serversList = ((IEnumerable<Server>)cache.Get("servers")).ToList();
-            Server getServer = serversList.Where(x => String.Equals(x.ServerID, serverID)).FirstOrDefault();
+            Server getServer = serversList.Where(x => String.Equals(x.ServerID, serverID))
+                .FirstOrDefault();
             // insert the list to the cache
             cache.Set("servers", serversList);
 

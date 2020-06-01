@@ -25,7 +25,7 @@ namespace FlightControlWeb.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Server>> GetAllExternalServers()
         {
-            return CreatedAtAction(actionName: "GetAllExternalServers", this.serverManager.getAllExternalServers());
+            return CreatedAtAction(actionName: "GetAllExternalServers", this.serverManager.GetAllExternalServers());
         }
 
         // POST: api/Servers
@@ -35,7 +35,7 @@ namespace FlightControlWeb.Controllers
             // check if the flight plan is valid
             if (ModelState.IsValid)
             {
-                this.serverManager.addNewServer(newServer);
+                this.serverManager.AddNewServer(newServer);
                 return CreatedAtAction(actionName: "AddNewServer", newServer);
             }
             else
@@ -49,7 +49,7 @@ namespace FlightControlWeb.Controllers
         {
             try
             {
-                Server s = this.serverManager.getServer(serverID);
+                Server s = this.serverManager.GetServer(serverID);
                 return CreatedAtAction(actionName: "GetServer", s);
             }
             catch
@@ -64,7 +64,7 @@ namespace FlightControlWeb.Controllers
         {
             try
             {
-                this.serverManager.deleteServer(serverID);
+                this.serverManager.DeleteServer(serverID);
                 return CreatedAtAction(actionName: "DeleteServer", "Server with ID " + serverID + " deleted");
             }
             catch

@@ -29,7 +29,7 @@ namespace FlightControlWeb.Controllers
         {
             try
             {
-                return CreatedAtAction(actionName: "GetFlightPlan", await flightPlansModel.getFlightPlan(id));
+                return CreatedAtAction(actionName: "GetFlightPlan", await flightPlansModel.GetFlightPlan(id));
             }
             catch
             {
@@ -45,17 +45,17 @@ namespace FlightControlWeb.Controllers
             if (ModelState.IsValid)
             {
                 // generate new id
-                string flight_id = this.flightPlansModel.generateFlight_Id(newFlightPlan.CompanyName);
+                string flight_id = this.flightPlansModel.GenerateFlightId(newFlightPlan.CompanyName);
 
                 // creating the flight object from the flight plan
-                Flight newFlight = flightsModel.createFlightByFlightPlan(newFlightPlan, flight_id);
+                Flight newFlight = flightsModel.CreateFlightByFlightPlan(newFlightPlan, flight_id);
                 newFlight.IsExternal = false;
 
                 // adding the new flight to the list
-                this.flightsModel.addNewFlight(newFlight);
+                this.flightsModel.AddNewFlight(newFlight);
 
                 // adding the flight plan
-                this.flightPlansModel.addNewFlightPlan(newFlightPlan, flight_id);
+                this.flightPlansModel.AddNewFlightPlan(newFlightPlan, flight_id);
 
                 return CreatedAtAction(actionName: "AddNewFlightPlan", newFlight);
             }

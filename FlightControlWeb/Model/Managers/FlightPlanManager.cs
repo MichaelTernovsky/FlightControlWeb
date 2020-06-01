@@ -24,7 +24,7 @@ namespace FlightControlWeb.Model.Managers
             this.serverManager = new ServerManager(this.cache);
         }
 
-        public void addNewFlightPlan(FlightPlan newFlightPlan, string flightID)
+        public void AddNewFlightPlan(FlightPlan newFlightPlan, string flightID)
         {
             // get the list from the cache
             var flightsDict = (Dictionary<string, FlightPlan>)cache.Get("flightsDict");
@@ -34,7 +34,7 @@ namespace FlightControlWeb.Model.Managers
             // insert the list to the cache
             cache.Set("flightsDict", flightsDict);
         }
-        public void deleteFlightPlan(string flight_id)
+        public void DeleteFlightPlan(string flight_id)
         {
             // get the list from the cache
             var flightsDict = (Dictionary<string, FlightPlan>)cache.Get("flightsDict");
@@ -57,7 +57,8 @@ namespace FlightControlWeb.Model.Managers
             try
             {
                 // Geting the flight plan from the server.
-                var resp = await client.GetStringAsync(serverURL + "/api/FlightPlan/" + id.ToString());
+                var resp = await client.GetStringAsync(serverURL + "/api/FlightPlan/" +
+                    id.ToString());
                 fp = JsonConvert.DeserializeObject<FlightPlan>(resp);
             }
             catch
@@ -68,7 +69,7 @@ namespace FlightControlWeb.Model.Managers
             return fp;
         }
 
-        public async Task<FlightPlan> getFlightPlan(string flight_id)
+        public async Task<FlightPlan> GetFlightPlan(string flight_id)
         {
             // get the list from the cache
             var flightsDict = (Dictionary<string, FlightPlan>)cache.Get("flightsDict");
@@ -93,7 +94,8 @@ namespace FlightControlWeb.Model.Managers
                     client.BaseAddress = new Uri(serverURL);
 
                     client.DefaultRequestHeaders.Add("User-Agent", "C# console program");
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue
+                        ("application/json"));
 
                     // send request to get the flight plan
                     fp = await sendingRequest(client, serverURL, flight_id);
@@ -112,7 +114,7 @@ namespace FlightControlWeb.Model.Managers
 
             return fp;
         }
-        public string generateFlight_Id(string companyName)
+        public string GenerateFlightId(string companyName)
         {
             bool isGoodKey = true;
             string flight_id = "";
@@ -126,7 +128,7 @@ namespace FlightControlWeb.Model.Managers
                 int number = r.Next(1, 1000);
                 flight_id += number.ToString();
 
-                if (this.isIdExist(flight_id) == 0)
+                if (this.IsIdExist(flight_id) == 0)
                 {
                     // the key does not exist - the key is good
                     isGoodKey = false;
@@ -137,7 +139,7 @@ namespace FlightControlWeb.Model.Managers
 
             return flight_id;
         }
-        public int isIdExist(string flight_id)
+        public int IsIdExist(string flight_id)
         {
             // get the list from the cache
             var flightsDict = (Dictionary<string, FlightPlan>)cache.Get("flightsDict");
