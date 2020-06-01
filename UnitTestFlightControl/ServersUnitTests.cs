@@ -1,16 +1,12 @@
-using FlightControlWeb.Controllers;
 using FlightControlWeb.Model.ConcreteObjects;
 using FlightControlWeb.Model.Interfaces;
 using FlightControlWeb.Model.Managers;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace UnitTestFlightControl
 {
@@ -20,24 +16,17 @@ namespace UnitTestFlightControl
         [TestMethod]
         public void ShouldReturnServersList()
         {
-            // creating the list of servers
-            List<Server> serversList = new List<Server>();
+            // creating the string that represents the json server file
+            string serJson = "{'ServerId': '1',  'ServerURL': 'http://test.com'}";
 
-            // creating new server
-            Server newServer1 = new Server { ServerID = "id1", ServerURL = "url1" };
-            Server newServer2 = new Server { ServerID = "id2", ServerURL = "url2" };
+            // mocking the server's GetAllExternalServers function
+            Mock<IServerManager> Server_Mock = new Mock<IServerManager>();
+            Server server = JsonConvert.DeserializeObject<Server>(serJson);
+            List<Server> serversList = new List<Server>(1) { server };
+            Server_Mock.Setup(x => x.GetAllExternalServers()).Returns(serversList);
 
-            // adding the servers to the list
-            serversList.Add(newServer1);
-            serversList.Add(newServer2);
-            // creating server manager object
-            IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
-            // adding the lists to the cache
-            _cache.Set("servers", serversList);
-            // creating the manager
-            IServerManager serverManager = new ServerManager(_cache);
-
-            var actual = (List<Server>)serverManager.GetAllExternalServers();
+            // what we expect to get and what the actual result
+            var actual = (List<Server>)Server_Mock.Object.GetAllExternalServers();
             var expected = serversList;
 
             // the list should contain the same number of elements
@@ -52,25 +41,18 @@ namespace UnitTestFlightControl
         [TestMethod]
         public void ShouldReturnServersByID()
         {
-            // creating the list of servers
-            List<Server> serversList = new List<Server>();
+            // creating the string that represents the json server file
+            string serJson = "{'ServerId': '1',  'ServerURL': 'http://test.com'}";
 
-            // creating new server
-            Server newServer = new Server { ServerID = "111", ServerURL = "111" };
+            // mocking the server's GetAllExternalServers function
+            Mock<IServerManager> Server_Mock = new Mock<IServerManager>();
+            Server server = JsonConvert.DeserializeObject<Server>(serJson);
+            Server_Mock.Setup(x => x.GetServer(server.ServerID)).Returns(server);
 
-            // adding the server to the list
-            serversList.Add(newServer);
-
-            // creating server manager object
-            IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
-            // adding the lists to the cache
-            _cache.Set("servers", serversList);
-            // creating the manager
-            IServerManager serverManager = new ServerManager(_cache);
-
-            var actual = serverManager.GetServer(newServer.ServerID);
-            var expected = newServer;
-            var fakeServer = new Server { ServerID = "111", ServerURL = "111" };
+            // what we expect to get and what the actual result
+            var actual = Server_Mock.Object.GetServer("1");
+            var expected = server;
+            var fakeServer = new Server { ServerID = "2", ServerURL = "http://fake.com" };
 
             Assert.AreEqual(actual, expected);
             Assert.AreNotEqual(actual, fakeServer);
@@ -79,25 +61,20 @@ namespace UnitTestFlightControl
         [TestMethod]
         public void ShouldAddNewServer()
         {
-            // creating the list of servers
-            List<Server> serversList = new List<Server>();
+            // creating the string that represents the json server file
+            string serJson = "{'ServerId': '1',  'ServerURL': 'http://test.com'}";
 
-            // creating new server
-            Server newServer = new Server { ServerID = "111", ServerURL = "111" };
+            // mocking the server's GetAllExternalServers function
+            Mock<IServerManager> Server_Mock = new Mock<IServerManager>();
+            Server server = JsonConvert.DeserializeObject<Server>(serJson);
+            Server_Mock.Setup(x => x.AddNewServer(server));
+            Server_Mock.Setup(x => x.GetServer(server.ServerID)).Returns(server);
 
-            // creating server manager object
-            IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
-            // adding the lists to the cache
-            _cache.Set("servers", serversList);
-            // creating the manager
-            IServerManager serverManager = new ServerManager(_cache);
-
-            // adding the server to the list
-            serverManager.AddNewServer(newServer);
-
-            var actual = serverManager.GetServer(newServer.ServerID);
-            var expected = newServer;
-            var fakeServer = new Server { ServerID = "111", ServerURL = "111" };
+            // what we expect to get and what the actual result
+            Server_Mock.Object.AddNewServer(server);
+            var actual = Server_Mock.Object.GetServer("1");
+            var expected = server;
+            var fakeServer = new Server { ServerID = "2", ServerURL = "http://fake.com" };
 
             Assert.AreEqual(actual, expected);
             Assert.AreNotEqual(actual, fakeServer);
