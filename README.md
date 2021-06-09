@@ -1,6 +1,6 @@
 # FlightControlWeb
 
-Real time web application for managing flight by using Rest API requests to a server side, found it the same repository.
+Real time web application for managing flights by using Rest API requests to a server side, found it the same repository.
 
 The application allows us to add new "internal flights" in Json format add see it changing according to timeline.
 
