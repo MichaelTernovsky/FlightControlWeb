@@ -2,7 +2,7 @@
 
 Real time web application for managing flights by using Rest API requests to a server side, found it the same repository.
 
-The application allows us to add new "internal flights" in Json format add see it changing according to timeline.
+The application allows us to add new "internal flights" in Json format and see it changing according to timeline.
 
 We can also add "external flight" from another server that implementing the same API as ours.
 
