@@ -13,7 +13,7 @@ DB - MySQL.
 Server - C#.
 
 # Running
-Run the client side along side with server side.
+Run the client side along side with server side, found it the same repository.
 
 # Versions
 Using Github for versions control.
