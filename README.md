@@ -13,7 +13,7 @@ DB - MySQL.
 Server - C#.
 
 # Running
-Run the client side along side with server side, found in "FlightMobileServer" repository.
+Run the client side along side with server side.
 
 # Versions
 Using Github for versions control.
